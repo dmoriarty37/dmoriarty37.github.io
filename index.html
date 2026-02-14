@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>David Moriarty — FinTech Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c0f;
+    --surface: #111418;
+    --surface2: #181d24;
+    --border: rgba(255,255,255,0.07);
+    --accent: #00e5b0;
+    --accent2: #f7c752;
+    --accent3: #6b8aff;
+    --text: #e8eaf0;
+    --text-muted: #6b7585;
+    --text-dim: #3a4050;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ─── NOISE TEXTURE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ─── GRID BACKGROUND ─── */
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,176,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,176,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 48px;
+    background: rgba(10,12,15,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--accent); }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 120px 48px 80px;
+    z-index: 1;
+  }
+
+  .hero-inner {
+    max-width: 900px;
+  }
+
+  .hero-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.2s forwards;
+  }
+
+  .hero-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(52px, 7vw, 96px);
+    line-height: 1.0;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.4s forwards;
+  }
+
+  .hero-name em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-desc {
+    font-size: 18px;
+    color: var(--text-muted);
+    font-weight: 300;
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 48px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.6s forwards;
+  }
+
+  .hero-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 48px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.7s forwards;
+  }
+
+  .pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+  }
+
+  .pill:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 16px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.8s forwards;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+    font-weight: 500;
+  }
+
+  .btn-primary:hover {
+    background: #00ffbf;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 30px rgba(0,229,176,0.25);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--text-muted);
+    color: var(--text);
+  }
+
+  /* Floating terminal widget */
+  .hero-terminal {
+    position: absolute;
+    right: 48px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 380px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    opacity: 0;
+    animation: fadeLeft 1s ease 1s forwards;
+  }
+
+  .terminal-bar {
+    background: var(--surface2);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .terminal-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .td-red { background: #ff5f57; }
+  .td-yellow { background: #febc2e; }
+  .td-green { background: #28c840; }
+
+  .terminal-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-left: 8px;
+  }
+
+  .terminal-body {
+    padding: 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+  }
+
+  .t-comment { color: #3a4d40; }
+  .t-key { color: var(--accent3); }
+  .t-val { color: var(--accent); }
+  .t-str { color: var(--accent2); }
+  .t-punc { color: var(--text-muted); }
+  .t-cursor {
+    display: inline-block;
+    width: 8px;
+    height: 14px;
+    background: var(--accent);
+    vertical-align: middle;
+    animation: blink 1s step-end infinite;
+  }
+
+  /* ─── SECTIONS ─── */
+  section {
+    position: relative;
+    z-index: 1;
+    padding: 100px 48px;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(32px, 4vw, 52px);
+    line-height: 1.15;
+    margin-bottom: 64px;
+  }
+
+  /* ─── PROJECTS ─── */
+  #projects {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
+  }
+
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+  }
+
+  .project-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(0,229,176,0.04), transparent 40%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .project-card:hover::before { opacity: 1; }
+  .project-card:hover {
+    border-color: rgba(0,229,176,0.2);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+
+  /* Featured card spans 2 columns */
+  .project-card.featured {
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  @media (max-width: 900px) {
+    .project-card.featured {
+      grid-column: span 1;
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .card-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    display: inline-block;
+    margin-bottom: 20px;
+  }
+
+  .tag-green { background: rgba(0,229,176,0.12); color: var(--accent); }
+  .tag-yellow { background: rgba(247,199,82,0.12); color: var(--accent2); }
+  .tag-blue { background: rgba(107,138,255,0.12); color: var(--accent3); }
+  .tag-purple { background: rgba(180,120,255,0.12); color: #b478ff; }
+  .tag-red { background: rgba(255,80,80,0.12); color: #ff7070; }
+
+  .card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  .card-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+
+  .card-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .stack-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  .stack-tag.highlight {
+    color: var(--text-muted);
+    border-color: rgba(255,255,255,0.12);
+  }
+
+  .card-metric {
+    display: flex;
+    gap: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .metric-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .metric-val {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    color: var(--accent);
+  }
+
+  .metric-val.yellow { color: var(--accent2); }
+  .metric-val.blue { color: var(--accent3); }
+
+  .metric-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* mini chart in featured card */
+  .mini-chart {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 160px;
+  }
+
+  .chart-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 100px;
+  }
+
+  .bar {
+    flex: 1;
+    border-radius: 3px 3px 0 0;
+    transition: height 0.5s ease;
+    min-width: 8px;
+  }
+
+  .bar.green { background: var(--accent); opacity: 0.7; }
+  .bar.red { background: #ff5555; opacity: 0.7; }
+  .bar.dim { background: var(--text-dim); opacity: 0.4; }
+
+  .chart-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 8px;
+    text-align: center;
+    letter-spacing: 0.05em;
+  }
+
+  /* ─── ABOUT / SKILLS ─── */
+  #about {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  @media (max-width: 768px) {
+    .about-grid { grid-template-columns: 1fr; gap: 48px; }
+  }
+
+  .about-text {
+    font-size: 16px;
+    color: var(--text-muted);
+    line-height: 1.8;
+    margin-bottom: 24px;
+  }
+
+  .skill-group {
+    margin-bottom: 32px;
+  }
+
+  .skill-group-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .skill-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .skill-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    width: 120px;
+    flex-shrink: 0;
+  }
+
+  .skill-track {
+    flex: 1;
+    height: 3px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .skill-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 1s ease;
+  }
+
+  .skill-fill.yellow { background: var(--accent2); }
+  .skill-fill.blue { background: var(--accent3); }
+
+  .skill-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    width: 32px;
+    text-align: right;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    position: relative;
+    z-index: 1;
+    padding: 48px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: gap;
+    gap: 24px;
+  }
+
+  .footer-left {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--text-muted);
+  }
+
+  .footer-left em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 24px;
+  }
+
+  .footer-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--accent); }
+
+  .footer-copy {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  /* ─── DIVIDER ─── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0 48px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ─── STATS STRIP ─── */
+  .stats-strip {
+    position: relative;
+    z-index: 1;
+    padding: 40px 48px;
+    display: flex;
+    gap: 64px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .stat-block { display: flex; flex-direction: column; gap: 4px; }
+
+  .stat-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 42px;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .stat-num span {
+    color: var(--accent);
+  }
+
+  .stat-desc {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeLeft {
+    from { opacity: 0; transform: translate(40px, -50%); }
+    to { opacity: 1; transform: translate(0, -50%); }
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ─── TICKER TAPE ─── */
+  .ticker-wrap {
+    overflow: hidden;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    padding: 12px 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .ticker-track {
+    display: flex;
+    gap: 0;
+    animation: tickerMove 30s linear infinite;
+    width: max-content;
+  }
+
+  .ticker-item {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    padding: 0 32px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+  }
+
+  .ticker-item .up { color: var(--accent); }
+  .ticker-item .dn { color: #ff6b6b; }
+  .ticker-item .sym { color: var(--text); margin-right: 8px; font-weight: 500; }
+
+  @keyframes tickerMove {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* ─── CONTACT ─── */
+  .contact-row {
+    display: flex;
+    gap: 16px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+  }
+
+  .contact-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .contact-chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .chip-icon {
+    font-size: 16px;
+  }
+
+  /* mobile */
+  @media (max-width: 768px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    section { padding: 80px 24px; }
+    .hero { padding: 100px 24px 60px; }
+    .hero-terminal { display: none; }
+    .stats-strip { padding: 32px 24px; gap: 40px; }
+    footer { padding: 32px 24px; flex-direction: column; }
+    .divider { margin: 0 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">DM // Portfolio</div>
+  <ul class="nav-links">
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <p class="hero-label">// FinTech &amp; Quantitative Finance</p>
+    <h1 class="hero-name">David<br><em>Moriarty</em></h1>
+    <p class="hero-desc">
+      Building algorithmic trading systems, NLP-driven market signal engines, and ML pipelines that turn raw financial data into edge.
+    </p>
+    <div class="hero-pills">
+      <span class="pill">WashU in St. Louis</span>
+      <span class="pill">FIN 4506 / 5506</span>
+      <span class="pill">Quantitative Methods</span>
+      <span class="pill">Python · Pandas · scikit-learn</span>
+    </div>
+    <div class="hero-cta">
+      <a href="#projects" class="btn btn-primary">View Projects ↓</a>
+      <a href="#contact" class="btn btn-ghost">Get In Touch</a>
+    </div>
+  </div>
+
+  <!-- Terminal Widget -->
+  <div class="hero-terminal">
+    <div class="terminal-bar">
+      <div class="terminal-dot td-red"></div>
+      <div class="terminal-dot td-yellow"></div>
+      <div class="terminal-dot td-green"></div>
+      <span class="terminal-title">momentum_strategy.py</span>
+    </div>
+    <div class="terminal-body">
+      <div><span class="t-comment"># S&amp;P 500 Momentum Engine</span></div>
+      <div><span class="t-key">strategy</span><span class="t-punc"> = {</span></div>
+      <div>&nbsp;&nbsp;<span class="t-str">"lookback"</span><span class="t-punc">: </span><span class="t-val">84</span><span class="t-punc">, </span><span class="t-comment">// days</span></div>
+      <div>&nbsp;&nbsp;<span class="t-str">"universe"</span><span class="t-punc">: </span><span class="t-val">500</span><span class="t-punc">,</span></div>
+      <div>&nbsp;&nbsp;<span class="t-str">"sector_cap"</span><span class="t-punc">: </span><span class="t-val">3</span><span class="t-punc">,</span></div>
+      <div>&nbsp;&nbsp;<span class="t-str">"signal"</span><span class="t-punc">: </span><span class="t-str">"Risk-Adj Mom"</span></div>
+      <div><span class="t-punc">}</span></div>
+      <br>
+      <div><span class="t-comment"># Portfolio output</span></div>
+      <div><span class="t-key">portfolio</span><span class="t-punc">.</span><span class="t-val">run</span><span class="t-punc">()</span></div>
+      <div><span class="t-comment">&gt; 23 stocks selected</span></div>
+      <div><span class="t-comment">&gt; Equal-weighted, diversified</span></div>
+      <div><span class="t-comment">&gt; Export ready: xlsx / csv / json</span></div>
+      <div>&nbsp;<span class="t-cursor"></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER TAPE -->
+<div class="ticker-wrap">
+  <div class="ticker-track" id="ticker"></div>
+</div>
+
+<!-- STATS STRIP -->
+<div class="stats-strip">
+  <div class="stat-block">
+    <div class="stat-num">5<span>+</span></div>
+    <div class="stat-desc">Quant Projects</div>
+  </div>
+  <div class="stat-block">
+    <div class="stat-num">500<span>+</span></div>
+    <div class="stat-desc">Stocks Analyzed</div>
+  </div>
+  <div class="stat-block">
+    <div class="stat-num">3<span>k</span></div>
+    <div class="stat-desc">Lines of Python</div>
+  </div>
+  <div class="stat-block">
+    <div class="stat-num">4<span>+</span></div>
+    <div class="stat-desc">ML Models Built</div>
+  </div>
+</div>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div style="max-width:1200px;margin:0 auto;">
+    <p class="section-label reveal">// 01 &nbsp;Projects</p>
+    <h2 class="section-title reveal">What I've built</h2>
+
+    <div class="projects-grid">
+
+      <!-- FEATURED: Momentum Strategy -->
+      <div class="project-card featured reveal">
+        <div>
+          <span class="card-tag tag-green">Live App · Streamlit</span>
+          <h3 class="card-title">S&amp;P 500 Momentum Strategy Engine</h3>
+          <p class="card-desc">
+            Full-stack quantitative trading system that dynamically fetches the S&amp;P 500 universe from Wikipedia and DataHub, downloads price history via yfinance, and constructs risk-adjusted momentum portfolios with sector diversification caps. Supports both simple and regression-based momentum signals with full export to Excel, CSV, and JSON.
+          </p>
+          <div class="card-stack">
+            <span class="stack-tag highlight">Python</span>
+            <span class="stack-tag highlight">Streamlit</span>
+            <span class="stack-tag highlight">yfinance</span>
+            <span class="stack-tag highlight">pandas</span>
+            <span class="stack-tag highlight">numpy</span>
+            <span class="stack-tag">Portfolio Optimization</span>
+            <span class="stack-tag">Sector Analysis</span>
+            <span class="stack-tag">Risk-Adj Ranking</span>
+          </div>
+          <div class="card-metric">
+            <div class="metric-item">
+              <span class="metric-val">500</span>
+              <span class="metric-label">Tickers Scanned</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-val yellow">2</span>
+              <span class="metric-label">Signal Types</span>
+            </div>
+            <div class="metric-item">
+              <span class="metric-val blue">3</span>
+              <span class="metric-label">Export Formats</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="mini-chart">
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-dim);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;">Risk-Adj Momentum Signal</div>
+            <div class="chart-bars" id="momentumBars"></div>
+            <div class="chart-label">Strategy vs. S&amp;P 500 sample output</div>
+          </div>
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;">
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text-dim);margin-bottom:12px;letter-spacing:0.1em;text-transform:uppercase;">Key Features</div>
+            <div style="font-size:13px;color:var(--text-muted);line-height:1.8;">
+              ✦ Dynamic universe fetching (Wikipedia → DataHub → static fallback)<br>
+              ✦ Max 3 stocks per sector (diversification enforcement)<br>
+              ✦ Regression &amp; simple momentum modes<br>
+              ✦ One-click portfolio export
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- News Sentiment Predictor -->
+      <div class="project-card reveal">
+        <span class="card-tag tag-yellow">NLP · Machine Learning</span>
+        <h3 class="card-title">News-Driven Stock Prediction System</h3>
+        <p class="card-desc">
+          V4.0 of a personal stock predictor that scrapes financial news from BizToc, Yahoo Finance RSS, Seeking Alpha, Reddit, and MarketWatch — then uses TextBlob sentiment analysis and Random Forest / Gradient Boosting classifiers to predict directional moves.
+        </p>
+        <div class="card-stack">
+          <span class="stack-tag highlight">Python</span>
+          <span class="stack-tag highlight">scikit-learn</span>
+          <span class="stack-tag highlight">TextBlob</span>
+          <span class="stack-tag highlight">BeautifulSoup</span>
+          <span class="stack-tag highlight">feedparser</span>
+          <span class="stack-tag">Random Forest</span>
+          <span class="stack-tag">Gradient Boosting</span>
+          <span class="stack-tag">NLP Sentiment</span>
+        </div>
+        <div class="card-metric">
+          <div class="metric-item">
+            <span class="metric-val yellow">5</span>
+            <span class="metric-label">News Sources</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-val yellow">120+</span>
+            <span class="metric-label">Articles / Run</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-val yellow">2</span>
+            <span class="metric-label">ML Models</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Algo Backtesting -->
+      <div class="project-card reveal">
+        <span class="card-tag tag-blue">Algo Trading · Backtesting</span>
+        <h3 class="card-title">Dual SMA Crossover Backtester</h3>
+        <p class="card-desc">
+          Implements a full vectorized backtesting framework for a dual simple moving average (20/50-day) crossover strategy on MSFT. Compares strategy returns against a long-only benchmark using log-return arithmetic, accounting for look-ahead bias via position shifting.
+        </p>
+        <div class="card-stack">
+          <span class="stack-tag highlight">Python</span>
+          <span class="stack-tag highlight">pandas</span>
+          <span class="stack-tag highlight">numpy</span>
+          <span class="stack-tag highlight">matplotlib</span>
+          <span class="stack-tag highlight">yfinance</span>
+          <span class="stack-tag">Vectorized Backtest</span>
+          <span class="stack-tag">Log Returns</span>
+          <span class="stack-tag">SMA Signals</span>
+        </div>
+        <div class="card-metric">
+          <div class="metric-item">
+            <span class="metric-val blue">20/50</span>
+            <span class="metric-label">SMA Windows</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-val blue">3yr</span>
+            <span class="metric-label">Backtest Period</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ML Housing Prediction -->
+      <div class="project-card reveal">
+        <span class="card-tag tag-purple">ML · Predictive Modeling</span>
+        <h3 class="card-title">Melbourne Housing Price Predictor</h3>
+        <p class="card-desc">
+          Solo final project applying supervised machine learning to Kaggle's Melbourne Housing dataset scraped from Domain.com.au. Full pipeline from EDA and ydata profiling through feature engineering, model selection, and evaluation — including visualizations of price by region, rooms, and bedrooms.
+        </p>
+        <div class="card-stack">
+          <span class="stack-tag highlight">Python</span>
+          <span class="stack-tag highlight">scikit-learn</span>
+          <span class="stack-tag highlight">pandas</span>
+          <span class="stack-tag highlight">seaborn</span>
+          <span class="stack-tag highlight">ydata-profiling</span>
+          <span class="stack-tag">Feature Engineering</span>
+          <span class="stack-tag">Regression</span>
+          <span class="stack-tag">EDA</span>
+        </div>
+        <div class="card-metric">
+          <div class="metric-item">
+            <span class="metric-val" style="color:#b478ff;">Kaggle</span>
+            <span class="metric-label">Dataset Source</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-val" style="color:#b478ff;">Solo</span>
+            <span class="metric-label">Project</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Black Thursday Scraper -->
+      <div class="project-card reveal">
+        <span class="card-tag tag-red">Web Scraping · Finance History</span>
+        <h3 class="card-title">2020 Market Crash Data Scraper</h3>
+        <p class="card-desc">
+          A focused web scraper targeting Wikipedia's comprehensive coverage of the 2020 stock market crash (Black Thursday). Built with requests and BeautifulSoup to extract structured financial event data for analysis.
+        </p>
+        <div class="card-stack">
+          <span class="stack-tag highlight">Python</span>
+          <span class="stack-tag highlight">requests</span>
+          <span class="stack-tag highlight">pandas</span>
+          <span class="stack-tag">Web Scraping</span>
+          <span class="stack-tag">Financial Events</span>
+        </div>
+        <div class="card-metric">
+          <div class="metric-item">
+            <span class="metric-val" style="color:#ff7070;">2020</span>
+            <span class="metric-label">Market Crash Study</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FinTech Class Projects -->
+      <div class="project-card reveal">
+        <span class="card-tag tag-green">Data Sources · APIs</span>
+        <h3 class="card-title">Algo Trading Data Pipeline</h3>
+        <p class="card-desc">
+          Exploration of financial data sources for algorithmic trading — covering API integrations, data normalization, and pipeline construction for live and historical market data feeds as part of WashU's FinTech curriculum.
+        </p>
+        <div class="card-stack">
+          <span class="stack-tag highlight">Python</span>
+          <span class="stack-tag highlight">Jupyter</span>
+          <span class="stack-tag highlight">pandas</span>
+          <span class="stack-tag">API Integration</span>
+          <span class="stack-tag">Data Normalization</span>
+          <span class="stack-tag">Market Data</span>
+        </div>
+        <div class="card-metric">
+          <div class="metric-item">
+            <span class="metric-val">Multi</span>
+            <span class="metric-label">Data Sources</span>
+          </div>
+          <div class="metric-item">
+            <span class="metric-val">Live</span>
+            <span class="metric-label">&amp; Historical</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-grid">
+    <div>
+      <p class="section-label reveal">// 02 &nbsp;About</p>
+      <h2 class="section-title reveal" style="margin-bottom:32px;">Quantitative<br><em style="font-style:italic;color:var(--accent);">thinker</em> &amp;<br>builder</h2>
+      <p class="about-text reveal">
+        I'm a finance student at Washington University in St. Louis studying the intersection of technology and capital markets. My work spans algorithmic trading, natural language processing for market signals, and machine learning applied to financial data.
+      </p>
+      <p class="about-text reveal">
+        I'm drawn to problems where data is messy, markets are inefficient, and the right model can find edge. Every project here started with real curiosity — not a tutorial.
+      </p>
+      <div class="contact-row reveal" id="contact">
+        <a href="mailto:dmoriarty@wuslt.edu" class="contact-chip">
+          <span class="chip-icon">✉</span> Email
+        </a>
+        <a href="https://www.linkedin.com/in/david--moriarty" class="contact-chip" target="_blank">
+          <span class="chip-icon">in</span> LinkedIn
+        </a>
+      </div>
+    </div>
+
+    <div>
+      <p class="section-label reveal" style="margin-bottom:32px;">// Skills</p>
+
+      <div class="skill-group reveal">
+        <div class="skill-group-label">Languages &amp; Frameworks</div>
+        <div class="skill-bar-row">
+          <span class="skill-name">Python</span>
+          <div class="skill-track"><div class="skill-fill" data-width="95"></div></div>
+          <span class="skill-pct">95%</span>
+        </div>
+        <div class="skill-bar-row">
+          <span class="skill-name">pandas / numpy</span>
+          <div class="skill-track"><div class="skill-fill" data-width="90"></div></div>
+          <span class="skill-pct">90%</span>
+        </div>
+        <div class="skill-bar-row">
+          <span class="skill-name">Streamlit</span>
+          <div class="skill-track"><div class="skill-fill" data-width="80"></div></div>
+          <span class="skill-pct">80%</span>
+        </div>
+        <div class="skill-bar-row">
+          <span class="skill-name">SQL</span>
+          <div class="skill-track"><div class="skill-fill" data-width="70"></div></div>
+          <span class="skill-pct">70%</span>
+        </div>
+      </div>
+
+      <div class="skill-group reveal">
+        <div class="skill-group-label">Machine Learning</div>
+        <div class="skill-bar-row">
+          <span class="skill-name">scikit-learn</span>
+          <div class="skill-track"><div class="skill-fill yellow" data-width="85"></div></div>
+          <span class="skill-pct">85%</span>
+        </div>
+        <div class="skill-bar-row">
+          <span class="skill-name">Feature Eng.</span>
+          <div class="skill-track"><div class="skill-fill yellow" data-width="80"></div></div>
+          <span class="skill-pct">80%</span>
+        </div>
+        <div class="skill-bar-row">
+          <span class="skill-name">NLP / TextBlob</span>
+          <div class="skill-track"><div class="skill-fill yellow" data-width="75"></div></div>
+          <span class="skill-pct">75%</span>
+        </div>
+      </div>
+
+      <div class="skill-group reveal">
+        <div class="skill-group-label">Quantitative Finance</div>
+        <div class="skill-bar-row">
+          <span class="skill-name">Backtesting</span>
+          <div class="skill-track"><div class="skill-fill blue" data-width="85"></div></div>
+          <span class="skill-pct">85%</span>
+        </div>
+        <div class="skill-bar-row">
+          <span class="skill-name">Portfolio Theory</span>
+          <div class="skill-track"><div class="skill-fill blue" data-width="80"></div></div>
+          <span class="skill-pct">80%</span>
+        </div>
+        <div class="skill-bar-row">
+          <span class="skill-name">Risk Modeling</span>
+          <div class="skill-track"><div class="skill-fill blue" data-width="75"></div></div>
+          <span class="skill-pct">75%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">David <em>Moriarty</em></div>
+  <div class="footer-links">
+    <a href="#projects">Projects</a>
+    <a href="#about">About</a>
+    <a href="mailto:dmoriarty@wuslt.edu">Email</a>
+  </div>
+  <div class="footer-copy">© 2026 · David Moriarty · WashU St. Louis</div>
+</footer>
+
+<script>
+  // ─── TICKER TAPE ───
+  const tickers = [
+    { sym: 'AAPL', price: '211.45', chg: '+1.23%', up: true },
+    { sym: 'MSFT', price: '418.82', chg: '+0.74%', up: true },
+    { sym: 'NVDA', price: '131.20', chg: '-0.53%', up: false },
+    { sym: 'TSLA', price: '356.70', chg: '+2.11%', up: true },
+    { sym: 'JPM',  price: '248.90', chg: '+0.32%', up: true },
+    { sym: 'GOOGL',price: '195.40', chg: '-0.18%', up: false },
+    { sym: 'META', price: '721.13', chg: '+1.55%', up: true },
+    { sym: 'AMZN', price: '225.80', chg: '+0.91%', up: true },
+    { sym: 'AMD',  price: '110.23', chg: '-1.34%', up: false },
+    { sym: 'SPY',  price: '596.44', chg: '+0.45%', up: true },
+    { sym: 'QQQ',  price: '520.18', chg: '+0.67%', up: true },
+    { sym: 'AAPL', price: '211.45', chg: '+1.23%', up: true },
+    { sym: 'MSFT', price: '418.82', chg: '+0.74%', up: true },
+    { sym: 'NVDA', price: '131.20', chg: '-0.53%', up: false },
+    { sym: 'TSLA', price: '356.70', chg: '+2.11%', up: true },
+    { sym: 'JPM',  price: '248.90', chg: '+0.32%', up: true },
+    { sym: 'GOOGL',price: '195.40', chg: '-0.18%', up: false },
+    { sym: 'META', price: '721.13', chg: '+1.55%', up: true },
+    { sym: 'AMZN', price: '225.80', chg: '+0.91%', up: true },
+    { sym: 'AMD',  price: '110.23', chg: '-1.34%', up: false },
+    { sym: 'SPY',  price: '596.44', chg: '+0.45%', up: true },
+    { sym: 'QQQ',  price: '520.18', chg: '+0.67%', up: true },
+  ];
+  const track = document.getElementById('ticker');
+  tickers.forEach(t => {
+    const el = document.createElement('span');
+    el.className = 'ticker-item';
+    el.innerHTML = `<span class="sym">${t.sym}</span> ${t.price} <span class="${t.up ? 'up' : 'dn'}">${t.chg}</span>`;
+    track.appendChild(el);
+  });
+
+  // ─── MOMENTUM BARS ───
+  const barData = [
+    {h: 60, cls: 'green'}, {h: 72, cls: 'green'}, {h: 55, cls: 'green'},
+    {h: 30, cls: 'red'},   {h: 65, cls: 'green'}, {h: 80, cls: 'green'},
+    {h: 45, cls: 'red'},   {h: 88, cls: 'green'}, {h: 70, cls: 'green'},
+    {h: 40, cls: 'red'},   {h: 92, cls: 'green'}, {h: 60, cls: 'green'},
+    {h: 35, cls: 'red'},   {h: 78, cls: 'green'}, {h: 85, cls: 'green'},
+  ];
+  const container = document.getElementById('momentumBars');
+  barData.forEach(b => {
+    const bar = document.createElement('div');
+    bar.className = `bar ${b.cls}`;
+    bar.style.height = `${b.h}%`;
+    container.appendChild(bar);
+  });
+
+  // ─── SCROLL REVEAL ───
+  const revealEls = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+          // Trigger skill bars
+          entry.target.querySelectorAll('.skill-fill').forEach(fill => {
+            fill.style.transform = `scaleX(${fill.dataset.width / 100})`;
+          });
+        }, 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  revealEls.forEach(el => observer.observe(el));
+
+  // ─── CARD MOUSE GLOW ───
+  document.querySelectorAll('.project-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      card.style.setProperty('--mouse-x', x + '%');
+      card.style.setProperty('--mouse-y', y + '%');
+    });
+  });
+
+  // ─── STAGGERED REVEAL FOR CARDS ───
+  const cards = document.querySelectorAll('.project-card.reveal');
+  cards.forEach((card, i) => {
+    card.style.transitionDelay = `${i * 80}ms`;
+  });
+</script>
+</body>
+</html>
