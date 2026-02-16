@@ -328,16 +328,6 @@ footer{background:var(--navy);padding:28px 48px;display:flex;align-items:center;
       </div>
       <div class="proj-arrow">&#8594;</div>
     </div>
-     <div class="proj-card reveal" style="border-left-color:#b91c1c;" onclick="openCode('blackthursday','stock_market_crash_scraper.py')">
-      <div class="proj-icon" style="background:rgba(185,28,28,0.08);color:#b91c1c;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
-      <div class="proj-info">
-        <div class="proj-meta"><span class="proj-tag tag-red">Web Scraping &middot; Data Viz</span></div>
-        <div class="proj-title">2020 Stock Market Crash  -  Wikipedia Scraper</div>
-        <div class="proj-desc">Scrapes Wikipedia&apos;s 2020 stock market crash article to extract Table 2 (named crash days, % changes, closes). Pulls real DJIA price series via yfinance. Overlays Wikipedia event labels onto the live price chart  -  two data sources, one clean analysis.</div>
-        <div class="proj-stack"><span>Python</span><span>yfinance</span><span>requests</span><span>BeautifulSoup</span><span>pandas</span><span>matplotlib</span><span>Wikipedia Scraping</span></div>
-      </div>
-      <div class="proj-arrow">&#8594;</div>
-    </div>
     <div class="cat-label" style="margin-top:28px">Category 2  -  Data Science &amp; Engineering</div>
 
     <div class="proj-card reveal" style="border-left-color:#7c3aed;" onclick="openCode('planet','planet_thermal.cpp')">
@@ -427,30 +417,77 @@ const obs = new IntersectionObserver(entries => {
 }, {threshold:0.08});
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-const tickers = [
-  {sym:'AAPL', price:'213.49', chg:'+0.72%', up:true},
-  {sym:'MSFT', price:'408.21', chg:'+0.45%', up:true},
-  {sym:'NVDA', price:'131.38', chg:'-1.23%', up:false},
-  {sym:'TSLA', price:'350.74', chg:'+2.11%', up:true},
-  {sym:'JPM',  price:'256.80', chg:'+0.38%', up:true},
-  {sym:'GOOGL',price:'198.42', chg:'-0.29%', up:false},
-  {sym:'META', price:'718.09', chg:'+1.05%', up:true},
-  {sym:'AMZN', price:'232.15', chg:'+0.61%', up:true},
-  {sym:'AMD',  price:'112.54', chg:'-1.87%', up:false},
-  {sym:'SPY',  price:'599.32', chg:'+0.33%', up:true},
-  {sym:'QQQ',  price:'519.47', chg:'+0.18%', up:true},
-  {sym:'BTC',  price:'97,210', chg:'+1.44%', up:true},
-  {sym:'GS',   price:'619.43', chg:'+0.55%', up:true},
-  {sym:'CALM', price:'84.71',  chg:'-3.12%', up:false},
-  {sym:'ONON', price:'43.40',  chg:'+0.93%', up:true},
-];
 const track = document.getElementById('tickerTrack');
-[...tickers,...tickers].forEach(t => {
-  const el = document.createElement('span');
-  el.className = 'ticker-item';
-  el.innerHTML = `<span class="sym">${t.sym}</span> $${t.price} <span class="${t.up?'up':'dn'}">${t.chg}</span>`;
-  track.appendChild(el);
-});
+const tickerSyms = ['AAPL','MSFT','NVDA','TSLA','JPM','GOOGL','META','AMZN','AMD','SPY','QQQ','GS','CALM','ONON','BTC-USD'];
+
+function buildTicker(tickers) {
+  track.innerHTML = '';
+  [...tickers, ...tickers].forEach(t => {
+    const el = document.createElement('span');
+    el.className = 'ticker-item';
+    const up = t.chg >= 0;
+    const sym = t.sym === 'BTC-USD' ? 'BTC' : t.sym;
+    const price = t.sym === 'BTC-USD'
+      ? Number(t.price).toLocaleString('en-US', {maximumFractionDigits:0})
+      : Number(t.price).toFixed(2);
+    const chgStr = (up ? '+' : '') + Number(t.chg).toFixed(2) + '%';
+    el.innerHTML = `<span class="sym">${sym}</span> $${price} <span class="${up?'up':'dn'}">${chgStr}</span>`;
+    track.appendChild(el);
+  });
+}
+
+const fallbackPrices = [
+  {sym:'AAPL',    price:255.78,  chg:-2.27},
+  {sym:'MSFT',    price:400.15,  chg:0.50},
+  {sym:'NVDA',    price:182.78,  chg:2.23},
+  {sym:'TSLA',    price:417.44,  chg:0.09},
+  {sym:'JPM',     price:275.32,  chg:0.61},
+  {sym:'GOOGL',   price:305.72,  chg:1.06},
+  {sym:'META',    price:712.45,  chg:0.83},
+  {sym:'AMZN',    price:198.79,  chg:0.41},
+  {sym:'AMD',     price:207.32,  chg:0.67},
+  {sym:'SPY',     price:581.75,  chg:0.07},
+  {sym:'QQQ',     price:501.92,  chg:0.21},
+  {sym:'GS',      price:658.77,  chg:0.44},
+  {sym:'CALM',    price:92.14,   chg:-0.88},
+  {sym:'ONON',    price:51.63,   chg:1.24},
+  {sym:'BTC-USD', price:65420,   chg:-1.82},
+];
+
+async function fetchTicker() {
+  const syms = tickerSyms.join('%2C');
+  try {
+    const res = await fetch(
+      `https://query1.finance.yahoo.com/v8/finance/spark?symbols=${syms}&range=1d&interval=5m`,
+      {headers: {'User-Agent': 'Mozilla/5.0'}}
+    );
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    const spark = data?.spark?.result;
+    if (!spark || !spark.length) throw new Error();
+
+    // Use quote endpoint instead for price + change
+    const res2 = await fetch(
+      `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${syms}`,
+      {headers: {'User-Agent': 'Mozilla/5.0'}}
+    );
+    if (!res2.ok) throw new Error();
+    const data2 = await res2.json();
+    const quotes = data2?.quoteResponse?.result;
+    if (!quotes || !quotes.length) throw new Error();
+    const tickers = quotes.map(q => ({
+      sym: q.symbol,
+      price: q.regularMarketPrice,
+      chg: q.regularMarketChangePercent
+    }));
+    buildTicker(tickers);
+  } catch(e) {
+    buildTicker(fallbackPrices);
+  }
+}
+
+fetchTicker();
+setInterval(fetchTicker, 60000);
 
 function getCode(key){
   const el = document.getElementById('code_'+key);
@@ -1447,10 +1484,20 @@ sentences_above_90th = top_10_df[top_10_df['Sentence ascii value'] >= percentile
 print(f'The 90th percentile: {percentile_90th}')
 print(sentences_above_90th['State'].unique())
 </script>
-<script type="text/plain" id="code_melbourne">
+<script type="text/plain" id="code_melbourne"># Initialize Otter
+import otter
+grader = otter.Notebook("hw10.ipynb")
+
+# collaborators and sources:
+
+
+# your code here
+answer = 'my answer'
 
 import os
 os.environ["OMP_NUM_THREADS"] = "1" # run this first!
+
+# your code here
 
 import pandas as pd
 
@@ -1468,6 +1515,7 @@ data
 
 !conda install numba==0.58.1
 
+# your code here
 
 # importing the Profile Report module
 from ydata_profiling import ProfileReport
@@ -1485,7 +1533,7 @@ profile = data.profile_report(correlations= {
 
 profile
 
-
+# your code here
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
@@ -1533,6 +1581,7 @@ X_train.shape, X_test.shape, y_train.shape, y_test.shape
 #Just to see the training dataset
 X_train
 
+# your code here
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
@@ -1566,6 +1615,7 @@ preprocessor = ColumnTransformer(transformers=[
 X_train_processed = preprocessor.fit_transform(X_train)
 X_test_processed = preprocessor.transform(X_test)
 
+# your code here
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 import numpy as np
@@ -1591,6 +1641,7 @@ print("Linear Regression Results:")
 print(f"RMSE: {rmse:.4f}")
 print(f"R^2: {r2:.4f}")
 
+# your code here
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.model_selection import GridSearchCV
 
@@ -1618,6 +1669,7 @@ print("KNN Regression Results:")
 print("RMSE:", rmse_knn)
 print("R^2:", r2_knn)
 
+# your code here
 #importing the Decision Tree Regressor
 from sklearn.tree import DecisionTreeRegressor
 
@@ -1648,6 +1700,7 @@ print("Decision Tree Regression Results:")
 print("RMSE:", rmse_dt)
 print("R^2:", r2_dt)
 
+# your code here
 from sklearn.ensemble import RandomForestRegressor
 
 #pipeline for preprocessing
@@ -1674,6 +1727,7 @@ print("Random Forest Regression Results:")
 print("RMSE:", rmse_rf)
 print("R^2:", r2_rf)
 
+# your code here
 
 #Copy of the training and test sets so i don't change the original data
 X_train_for_fe = X_train.copy()
@@ -1705,6 +1759,7 @@ print(X_train_for_fe[[ 'Building_to_Land_Ratio', 'Sale_Year', 'Sale_Month', 'Bat
 num_missing_train = X_train_for_fe['Building_to_Land_Ratio'].isna().sum()
 print("Number of missing values in training set:", num_missing_train)
 
+# your code here
 
 #make a copy so I don't mess with feature engineering dataset
 X_train_fs = X_train_for_fe.copy()
@@ -1755,6 +1810,7 @@ X_test_sel = pd.DataFrame(X_test_processed, columns=feature_names)[best_features
 print(f"\nShape of selected training set: {X_train_sel.shape}")
 print(f"Shape of selected test set: {X_test_sel.shape}")
 
+# your code here
 
 #make sure i use copy of featured engineered datasets
 X_train_fe = X_train_for_fe.copy()
@@ -1775,6 +1831,7 @@ preprocessor_fe =  ColumnTransformer(transformers=[('num', num_transformer, num_
 X_train_fe_processed = preprocessor_fe.fit_transform(X_train_fe)
 X_test_fe_processed = preprocessor_fe.transform(X_test_fe)
 
+# your code here
 
 # This involves my categorical + numerical transformations and scales the final numeric features
 linear_model = Pipeline(steps=[('preprocessor', preprocessor_fe),('model', LinearRegression())])
@@ -1797,6 +1854,7 @@ print("Linear Regression Results:")
 print(f"RMSE: {rmse:.4f}")
 print(f"R^2: {r2:.4f}")
 
+# your code here
 
 # build  a full pipeline from preprocessing to model as we did before
 knn_model = Pipeline(steps=[('preprocessor', preprocessor_fe),('model', KNeighborsRegressor())])
@@ -1822,6 +1880,7 @@ print("KNN Regression Results:")
 print("RMSE:", rmse_knn)
 print("R^2:", r2_knn)
 
+# your code here
 
 #build a pipeline like done above from preprocessing to decision tree model 
 dt_pipeline = Pipeline(steps=[ ('preprocessor', preprocessor_fe), ('model', DecisionTreeRegressor(random_state=24))])
@@ -1850,6 +1909,7 @@ print("Decision Tree Regression Results:")
 print("RMSE:", rmse_dt)
 print("R^2:", r2_dt)
 
+# your code here
 
 #pipeline for preprocessing
 rf_pipeline = Pipeline(steps=[('preprocessor', preprocessor_fe),('model', RandomForestRegressor(random_state=24))])
@@ -1875,6 +1935,7 @@ print("Random Forest Regression Results:")
 print("RMSE:", rmse_rf)
 print("R^2:", r2_rf)
 
+# your code here
 import numpy as np
 
 #RSME from baseline models
@@ -1962,114 +2023,12 @@ plt.title("Baseline vs Feature-Engineered R^2")
 plt.xticks(x, models)
 plt.ylabel("R^2")
 plt.legend()
-plt.show()</script>
-  <script type="text/plain" id="code_blackthursday">import requests
-import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-import seaborn as sns
-import yfinance as yf
-from bs4 import BeautifulSoup
-
-# --- STEP 1: SCRAPE WIKIPEDIA FOR CRASH EVENT DATA ---
-URL = "https://en.wikipedia.org/wiki/2020_stock_market_crash"
-headers = {"User-Agent": "Mozilla/5.0 (educational research project)"}
-
-response = requests.get(URL, headers=headers)
-soup = BeautifulSoup(response.text, "html.parser")
-tables = pd.read_html(response.text)
-
-print(f"Found {len(tables)} tables on the page")
-
-# Table 2 contains the named crash days with dates, changes, and closes
-crash_events = tables[2].copy()
-print("\nCrash Events Table (from Wikipedia):")
-print(crash_events.to_string())
-
-# Clean up the scraped crash events table
-crash_events.columns = ["Name", "Date", "Change", "Change_Pct", "Close"]
-crash_events["Close"] = (crash_events["Close"]
-                          .astype(str)
-                          .str.replace(",", "")
-                          .str.replace("−", "-")
-                          .astype(float))
-crash_events["Date_2020"] = pd.to_datetime(crash_events["Date"] + " 2020", format="%d %B %Y")
-
-# --- STEP 2: PULL REAL DJIA PRICE DATA VIA YFINANCE ---
-djia = yf.download("^DJI", start="2020-02-10", end="2020-04-15", progress=False)
-djia = djia[["Close"]].reset_index()
-djia.columns = ["Date", "Close"]
-djia["Daily_Pct"] = djia["Close"].pct_change() * 100
-
-print(f"\nDJIA rows fetched: {len(djia)}")
-print(djia.head())
-
-# --- STEP 3: ANNOTATE WITH SCRAPED WIKIPEDIA EVENT LABELS ---
-event_map = {
-    row["Date_2020"].date(): row["Name"]
-    for _, row in crash_events.iterrows()
-}
-# Add pre-crash high manually (Wikipedia states Feb 12)
-event_map[pd.Timestamp("2020-02-12").date()] = "Pre-crash high"
-
-# --- STEP 4: PLOT ---
-sns.set_theme(style="whitegrid")
-fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(13, 9), sharex=True)
-
-# Chart 1: DJIA price line
-ax1.plot(djia["Date"], djia["Close"], color="steelblue", linewidth=2.2, zorder=3)
-ax1.fill_between(djia["Date"], djia["Close"], alpha=0.1, color="steelblue")
-ax1.set_ylabel("DJIA Closing Price", fontweight="bold")
-ax1.set_title("2020 Stock Market Crash — DJIA (yfinance) + Events (Wikipedia)", fontsize=13, fontweight="bold")
-
-offsets = {
-    "Pre-crash high":           (0, 18),
-    "Black Monday I":           (0, 18),
-    "Black Thursday":           (-60, 18),
-    "Black Monday II":          (10, -22),
-}
-for date, label in event_map.items():
-    row = djia[djia["Date"].dt.date == date]
-    if not row.empty:
-        price = row["Close"].values[0]
-        dx, dy = offsets.get(label, (10, 14))
-        ax1.annotate(label,
-                     xy=(row["Date"].values[0], price),
-                     xytext=(dx, dy), textcoords="offset points",
-                     fontsize=8, color="#333",
-                     arrowprops=dict(arrowstyle="->", color="#999", lw=0.8))
-        ax1.scatter(row["Date"].values[0], price, color="steelblue", s=40, zorder=5)
-
-# Chart 2: Daily % change bars
-colors = ["#ef4444" if x < 0 else "#22c55e" for x in djia["Daily_Pct"]]
-ax2.bar(djia["Date"], djia["Daily_Pct"], color=colors, alpha=0.8, width=0.7)
-ax2.axhline(0, color="black", linewidth=0.8, linestyle="--")
-ax2.set_ylabel("Daily % Change", fontweight="bold")
-ax2.set_title("Daily DJIA % Change", fontsize=12, fontweight="bold")
-ax2.xaxis.set_major_formatter(mdates.DateFormatter("%b %d"))
-ax2.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=0))
-plt.setp(ax2.get_xticklabels(), rotation=30, ha="right")
-ax2.set_xlabel("Date (2020)", fontweight="bold")
-
-# Annotate the three named crash days on bar chart
-for _, row in crash_events.iterrows():
-    match = djia[djia["Date"].dt.date == row["Date_2020"].date()]
-    if not match.empty:
-        pct = match["Daily_Pct"].values[0]
-        ax2.annotate(row["Name"],
-                     xy=(match["Date"].values[0], pct),
-                     xytext=(4, -16), textcoords="offset points",
-                     fontsize=7.5, color="#333",
-                     arrowprops=dict(arrowstyle="->", color="#999", lw=0.7))
-
-plt.tight_layout()
-plt.savefig("stock_market_crash_2020.png", dpi=150, bbox_inches="tight")
 plt.show()
 
-print("\nCrash summary from Wikipedia Table 2:")
-print(crash_events[["Name","Date","Change_Pct","Close"]].to_string(index=False))
-print("\nSource: https://en.wikipedia.org/wiki/2020_stock_market_crash")
-</script>
+grader.check_all()
+
+# Save your notebook first, then run this cell to export your submission.
+grader.export()</script>
 <script type="text/plain" id="code_fintech">import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D  
@@ -2622,23 +2581,4 @@ int main(){
                     }
                     if (i==person_x and j==person_y){
                         a="P";
-                    }
-                    }
-                        
-                    
-                
-                if (t>0){}
-                DrawScreenElement(a);
-                
-            }
-            cout << endl;
-        }
-    }
-     
-    return 0;
-}
-</script>
-
-
-</body>
-</html>
+         
