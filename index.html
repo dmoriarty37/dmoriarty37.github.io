@@ -561,7 +561,7 @@ warnings.filterwarnings("ignore")
 logging.basicConfig(level=logging.WARNING, format="%(asctime)s  %(levelname)s  %(message)s")
 log = logging.getLogger(__name__)
 
-# ── Ticker universe ───────────────────────────────────────────────────────────
+#Ticker universe
 TICKER_UNIVERSE = {
     "AAPL","MSFT","NVDA","GOOGL","GOOG","AMZN","META","TSLA","ORCL","CRM",
     "ADBE","NOW","SNOW","PLTR","UBER","ABNB","AMD","INTC","AVGO","QCOM",
@@ -586,7 +586,7 @@ _SKIP = {
     "EV","IV","PR","IR","HR","IT","VC","PE","RE","NY","LA","SF","DC","UK",
 }
 
-# ── Google News queries — one per sector/theme ────────────────────────────────
+# Google News queries — one per sector/theme 
 # More queries = more articles. Each returns ~10-20 headlines.
 GOOGLE_NEWS_QUERIES = [
     # Big tech
@@ -642,7 +642,7 @@ def _gn_url(query: str) -> str:
     )
 
 
-# ── HTTP helper ───────────────────────────────────────────────────────────────
+# HTTP helper 
 
 def _get(url: str, session: requests.Session, timeout: int = 12):
     for attempt in range(3):
@@ -678,7 +678,7 @@ def _parse_rss(xml_text: str) -> List[Dict]:
     return items
 
 
-# ── Ticker extraction ─────────────────────────────────────────────────────────
+# Ticker extraction 
 
 def extract_tickers(text: str) -> List[str]:
     found = set()
@@ -688,7 +688,7 @@ def extract_tickers(text: str) -> List[str]:
     return sorted(found)
 
 
-# ── Sentiment ─────────────────────────────────────────────────────────────────
+# Sentiment 
 
 def score_sentiment(text: str) -> Dict[str, float]:
     if not text:
@@ -698,7 +698,7 @@ def score_sentiment(text: str) -> Dict[str, float]:
             "subjectivity": b.sentiment.subjectivity}
 
 
-# ── Scrapers ──────────────────────────────────────────────────────────────────
+# Scrapers 
 
 def scrape_google_news(session: requests.Session) -> List[Dict]:
     """
@@ -797,7 +797,7 @@ def scrape_bonus_sources(session: requests.Session) -> List[Dict]:
     return articles
 
 
-# ── Main class ────────────────────────────────────────────────────────────────
+# Main class 
 
 class StockNewsPredictor:
 
@@ -819,7 +819,7 @@ class StockNewsPredictor:
         self.model  = None
         self.scaler = StandardScaler()
 
-    # ── Step 1 ────────────────────────────────────────────────────────────────
+    #  Step 1 
     def scrape(self) -> pd.DataFrame:
         print("\nScraping Google News (primary)...")
         primary = scrape_google_news(self.session)
@@ -838,7 +838,7 @@ class StockNewsPredictor:
         print(f"\n  ✓ {len(df)} unique ticker-bearing headlines collected")
         return df
 
-    # ── Step 2 ────────────────────────────────────────────────────────────────
+    # Step 2
     def build_features(self, df: pd.DataFrame) -> pd.DataFrame:
         rows = []
         for _, row in df.iterrows():
@@ -867,7 +867,7 @@ class StockNewsPredictor:
         agg["sentiment_edge"] = agg["pct_positive"] - agg["pct_negative"]
         return agg
 
-    # ── Step 3 ────────────────────────────────────────────────────────────────
+    # Step 3 
     def get_labels(self, tickers: List[str], forward_days: int = 5) -> pd.DataFrame:
         end   = datetime.now()
         start = end - timedelta(days=90)
@@ -901,7 +901,7 @@ class StockNewsPredictor:
 
         return pd.DataFrame(rows)
 
-    # ── Step 4 ────────────────────────────────────────────────────────────────
+    # Step 4
     def train(self, features: pd.DataFrame, labels: pd.DataFrame) -> None:
         merged = features.merge(labels[["ticker", "label"]], on="ticker", how="inner")
         if len(merged) < 10:
@@ -939,7 +939,7 @@ class StockNewsPredictor:
         print(classification_report(y_te, best_preds,
                                     target_names=["DOWN", "UP"], zero_division=0))
 
-    # ── Step 5 ────────────────────────────────────────────────────────────────
+    # Step 5 
     def predict(self, features: pd.DataFrame) -> pd.DataFrame:
         if self.model is None:
             raise RuntimeError("Call train() first.")
@@ -954,7 +954,7 @@ class StockNewsPredictor:
         out["confidence"] = [max(p) for p in proba]
         return out.sort_values("confidence", ascending=False).reset_index(drop=True)
 
-    # ── Save / load ───────────────────────────────────────────────────────────
+    # Save / load
     def save(self, path: str = None) -> None:
         if self.model is None:
             print("  Nothing to save — model not trained.")
@@ -972,7 +972,7 @@ class StockNewsPredictor:
         print(f"  Model loaded ← {path}")
 
 
-# ── Pretty output ─────────────────────────────────────────────────────────────
+# Pretty output 
 
 def print_results(articles: pd.DataFrame, features: pd.DataFrame,
                   labels: pd.DataFrame, predictions: pd.DataFrame) -> None:
@@ -1040,7 +1040,7 @@ def print_results(articles: pd.DataFrame, features: pd.DataFrame,
     print("═"*64)
 
 
-# ── Entry point ───────────────────────────────────────────────────────────────
+# Entry point 
 
 if __name__ == "__main__":
     p = StockNewsPredictor()
@@ -1572,19 +1572,10 @@ print(f'The 90th percentile: {percentile_90th}')
 print(sentences_above_90th['State'].unique())
 </script>
 <script type="text/plain" id="code_melbourne"># Initialize Otter
-import otter
-grader = otter.Notebook("hw10.ipynb")
-
-# collaborators and sources:
-
-
-# your code here
-answer = 'my answer'
 
 import os
 os.environ["OMP_NUM_THREADS"] = "1" # run this first!
 
-# your code here
 
 import pandas as pd
 
@@ -1602,8 +1593,6 @@ data
 
 !conda install numba==0.58.1
 
-# your code here
-
 # importing the Profile Report module
 from ydata_profiling import ProfileReport
 
@@ -1620,7 +1609,7 @@ profile = data.profile_report(correlations= {
 
 profile
 
-# your code here
+# 
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
@@ -1668,7 +1657,7 @@ X_train.shape, X_test.shape, y_train.shape, y_test.shape
 #Just to see the training dataset
 X_train
 
-# your code here
+#
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
@@ -1702,7 +1691,7 @@ preprocessor = ColumnTransformer(transformers=[
 X_train_processed = preprocessor.fit_transform(X_train)
 X_test_processed = preprocessor.transform(X_test)
 
-# your code here
+#
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 import numpy as np
@@ -1728,7 +1717,7 @@ print("Linear Regression Results:")
 print(f"RMSE: {rmse:.4f}")
 print(f"R^2: {r2:.4f}")
 
-# your code here
+#
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.model_selection import GridSearchCV
 
@@ -1756,7 +1745,7 @@ print("KNN Regression Results:")
 print("RMSE:", rmse_knn)
 print("R^2:", r2_knn)
 
-# your code here
+
 #importing the Decision Tree Regressor
 from sklearn.tree import DecisionTreeRegressor
 
@@ -1787,7 +1776,7 @@ print("Decision Tree Regression Results:")
 print("RMSE:", rmse_dt)
 print("R^2:", r2_dt)
 
-# your code here
+
 from sklearn.ensemble import RandomForestRegressor
 
 #pipeline for preprocessing
@@ -1814,7 +1803,6 @@ print("Random Forest Regression Results:")
 print("RMSE:", rmse_rf)
 print("R^2:", r2_rf)
 
-# your code here
 
 #Copy of the training and test sets so i don't change the original data
 X_train_for_fe = X_train.copy()
@@ -1846,7 +1834,6 @@ print(X_train_for_fe[[ 'Building_to_Land_Ratio', 'Sale_Year', 'Sale_Month', 'Bat
 num_missing_train = X_train_for_fe['Building_to_Land_Ratio'].isna().sum()
 print("Number of missing values in training set:", num_missing_train)
 
-# your code here
 
 #make a copy so I don't mess with feature engineering dataset
 X_train_fs = X_train_for_fe.copy()
@@ -1897,7 +1884,6 @@ X_test_sel = pd.DataFrame(X_test_processed, columns=feature_names)[best_features
 print(f"\nShape of selected training set: {X_train_sel.shape}")
 print(f"Shape of selected test set: {X_test_sel.shape}")
 
-# your code here
 
 #make sure i use copy of featured engineered datasets
 X_train_fe = X_train_for_fe.copy()
@@ -1918,7 +1904,6 @@ preprocessor_fe =  ColumnTransformer(transformers=[('num', num_transformer, num_
 X_train_fe_processed = preprocessor_fe.fit_transform(X_train_fe)
 X_test_fe_processed = preprocessor_fe.transform(X_test_fe)
 
-# your code here
 
 # This involves my categorical + numerical transformations and scales the final numeric features
 linear_model = Pipeline(steps=[('preprocessor', preprocessor_fe),('model', LinearRegression())])
@@ -1941,7 +1926,6 @@ print("Linear Regression Results:")
 print(f"RMSE: {rmse:.4f}")
 print(f"R^2: {r2:.4f}")
 
-# your code here
 
 # build  a full pipeline from preprocessing to model as we did before
 knn_model = Pipeline(steps=[('preprocessor', preprocessor_fe),('model', KNeighborsRegressor())])
@@ -1967,7 +1951,6 @@ print("KNN Regression Results:")
 print("RMSE:", rmse_knn)
 print("R^2:", r2_knn)
 
-# your code here
 
 #build a pipeline like done above from preprocessing to decision tree model 
 dt_pipeline = Pipeline(steps=[ ('preprocessor', preprocessor_fe), ('model', DecisionTreeRegressor(random_state=24))])
@@ -1996,7 +1979,6 @@ print("Decision Tree Regression Results:")
 print("RMSE:", rmse_dt)
 print("R^2:", r2_dt)
 
-# your code here
 
 #pipeline for preprocessing
 rf_pipeline = Pipeline(steps=[('preprocessor', preprocessor_fe),('model', RandomForestRegressor(random_state=24))])
@@ -2022,7 +2004,6 @@ print("Random Forest Regression Results:")
 print("RMSE:", rmse_rf)
 print("R^2:", r2_rf)
 
-# your code here
 import numpy as np
 
 #RSME from baseline models
@@ -2110,12 +2091,7 @@ plt.title("Baseline vs Feature-Engineered R^2")
 plt.xticks(x, models)
 plt.ylabel("R^2")
 plt.legend()
-plt.show()
-
-grader.check_all()
-
-# Save your notebook first, then run this cell to export your submission.
-grader.export()</script>
+plt.show()</script>
 <script type="text/plain" id="code_fintech">import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D  
@@ -2210,33 +2186,11 @@ ax2.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.show()
 
-"""
-ADD THIS CODE TO YOUR EXISTING SCRIPT
-======================================
-This code adds 3D volatility surface visualization.
-Simply append this to the end of your current code.
-"""
-
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.interpolate import griddata
 
 def visualize_volatility_surface(date_str, cleaned_df, model, scaler, device):
-    """
-    Create side-by-side 3D volatility surfaces (Observed vs Predicted)
-    
-    Parameters:
-    -----------
-    date_str : str
-        Date in format 'YYYY-MM-DD' (e.g., '2023-06-16')
-    cleaned_df : pd.DataFrame
-        Your cleaned dataframe with columns: date, S, K, T, moneyness, Impl_Vol, ^VIX
-    model : nn.Module
-        Your trained PyTorch model
-    scaler : StandardScaler
-        Your fitted StandardScaler
-    device : torch.device
-        Computation device
-    """
+  
     # Filter data for specific date
     date_data = cleaned_df[cleaned_df["date"] == date_str].copy()
     
@@ -2248,7 +2202,7 @@ def visualize_volatility_surface(date_str, cleaned_df, model, scaler, device):
     S_date = date_data["S"].iloc[0]
     vix_date = date_data["^VIX"].iloc[0]
     
-    print(f"\n📊 Generating surface for {date_str}")
+    print(f"\n Generating surface for {date_str}")
     print(f"   Spot: ${S_date:.2f} | VIX: {vix_date:.2f}")
     
     # Create grid for smooth surface
@@ -2256,7 +2210,7 @@ def visualize_volatility_surface(date_str, cleaned_df, model, scaler, device):
     T_range = np.linspace(30, 450, 100)
     moneyness_grid, T_grid = np.meshgrid(moneyness_range, T_range)
     
-    # --- PREDICTED SURFACE ---
+    # PREDICTED SURFACE
     # Prepare inputs
     n_points = moneyness_grid.size
     X_surface = np.column_stack([
@@ -2273,7 +2227,7 @@ def visualize_volatility_surface(date_str, cleaned_df, model, scaler, device):
         IV_pred = model(X_scaled).squeeze().cpu().numpy()
     IV_grid_pred = IV_pred.reshape(moneyness_grid.shape)
     
-    # --- OBSERVED SURFACE ---
+    # OBSERVED SURFACE
     # Interpolate observed data onto grid
     obs_moneyness = date_data["moneyness"].values
     obs_T = date_data["T"].values
@@ -2282,7 +2236,7 @@ def visualize_volatility_surface(date_str, cleaned_df, model, scaler, device):
     points = np.column_stack([obs_moneyness, obs_T])
     IV_grid_obs = griddata(points, obs_IV, (moneyness_grid, T_grid), method='cubic')
     
-    # --- CREATE FIGURE ---
+    #CREATE FIGURE
     fig = plt.figure(figsize=(16, 7))
     
     # Observed surface (left)
@@ -2316,18 +2270,13 @@ def visualize_volatility_surface(date_str, cleaned_df, model, scaler, device):
     
     return fig
 
-
-# ============================================================================
-# USAGE EXAMPLE - Add this after your model training code
-# ============================================================================
-
 # Make sure cleaned_df has a 'date' column as datetime
 if 'date' not in cleaned_df.columns:
     print("⚠ Warning: 'date' column not found in cleaned_df")
     print("Make sure to include 'date' when creating cleaned_df:")
     print("cleaned_df = df[['S', 'K', 'T', 'Price', '^VIX', 'Impl_Vol', 'date']].copy()")
 
-# Visualize for a specific date (like in your images)
+# Visualize for a specific date 
 target_date = "2023-06-16"
 
 # Check if date exists
@@ -2338,7 +2287,7 @@ if target_date in available_dates:
     plt.savefig(f'/mnt/user-data/outputs/vol_surface_{target_date}.png', dpi=150, bbox_inches='tight')
     plt.show()
 else:
-    print(f"\n⚠ Date {target_date} not in dataset")
+    print(f"\n Date {target_date} not in dataset")
     print(f"Date range: {available_dates.min()} to {available_dates.max()}")
     print(f"Using alternative date: {available_dates[0]}")
     
