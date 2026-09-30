@@ -148,6 +148,9 @@ body.ready .hero-photo img{animation-play-state:running}
 .job:hover{border-color:var(--line-2)}
 .job-n{font-family:"Geist Mono",monospace;font-size:12px;color:var(--faint);display:flex;justify-content:space-between}
 .job-org{font-size:clamp(28px,2.8vw,40px);font-weight:600;letter-spacing:-.045em;line-height:1.02;margin:auto 0 10px;padding-top:40px}
+.job-co{font-size:13px;color:var(--dim);line-height:1.5;margin:-8px 0 18px}
+.job-co a{color:var(--text);text-decoration:underline;text-decoration-color:var(--faint);text-underline-offset:3px;white-space:nowrap}
+.job-co a:hover{color:var(--acc);text-decoration-color:var(--acc)}
 .job-role{font-size:14px;color:var(--acc);margin-bottom:20px}
 .job ul{list-style:none;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);padding-top:20px}
 .job li{font-size:14px;color:#bebdb7;line-height:1.55;padding-left:18px;position:relative}
@@ -435,6 +438,7 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
         <div class="job-n"><span>Aug 2026 &mdash; Now</span><span>St. Louis</span></div>
         <div class="job-org">Advantage Capital</div>
         <div class="job-role">Student Consultant, WashU Olin Practicum</div>
+        <p class="job-co">St. Louis impact investment firm financing small businesses, affordable housing, and renewable energy in underserved communities since 1992. <a href="https://www.advantagecap.com" target="_blank" rel="noopener">advantagecap.com &nearr;</a></p>
         <ul>
           <li>Evaluating whether the firm should launch a Clean Energy Finance business line, assessing whether behind-the-meter battery storage projects for industrial hosts in Opportunity Zones clear return thresholds under an OZ-enhanced structure</li>
           <li>Sizing the addressable market under conventional project finance against the OZ structure, modeling adoption against cost of capital and PPA price to quantify the incremental market the structure unlocks</li>
@@ -448,6 +452,7 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
         <div class="job-n"><span>Jun &mdash; Aug 2026</span><span>Huntsville</span></div>
         <div class="job-org">NASA Marshall Space Flight Center</div>
         <div class="job-role">Business Analyst Intern, Office of the CFO</div>
+        <p class="job-co">One of NASA&apos;s largest field centers, in Huntsville, Alabama, home of rocket propulsion and the Space Launch System program. <a href="https://www.nasa.gov/marshall" target="_blank" rel="noopener">nasa.gov/marshall &nearr;</a></p>
         <ul>
           <li>Monitored $5B+ in capital deployment across the center&apos;s directorates against plan, building the FY26 investment tracking reporting and running FY24&ndash;FY26 variance analysis leadership used to redirect funding</li>
           <li>Selected to model ~$7B in cost obligations and actuals across ~200 Science Mission Directorate projects at NASA headquarters, building the forecasting tool used for agency-wide financial planning</li>
@@ -461,6 +466,7 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
         <div class="job-n"><span>Aug 2025 &mdash; Now</span><span>St. Louis</span></div>
         <div class="job-org">WashU Student Investment Fund</div>
         <div class="job-role">Senior Analyst</div>
+        <p class="job-co">WashU&apos;s student-led investment fund, affiliated with Olin Business School, where sector teams pitch stocks for a real portfolio.</p>
         <ul>
           <li>WUSIF is Washington University&apos;s student-managed investment fund, running a $250k+ equity portfolio where analysts research companies and pitch buy recommendations to an investment committee</li>
           <li>As a Senior Analyst, I cover the industrials and consumer sectors, building DCF valuations and structuring the diligence behind each pitch before it goes to committee</li>
@@ -474,6 +480,7 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
         <div class="job-n"><span>Sep &mdash; Dec 2025</span><span>St. Louis</span></div>
         <div class="job-org">BioGenerator Ventures</div>
         <div class="job-role">Student Consultant</div>
+        <p class="job-co">The startup arm of BioSTL, creating, building, and investing in St. Louis companies in human health and agriculture. <a href="https://www.biostl.org" target="_blank" rel="noopener">biostl.org &nearr;</a></p>
         <ul>
           <li>Analyzed the full 137-company portfolio of a seed-stage venture firm whose companies have raised $2.8B in follow-on capital against under $50M invested by the firm, over 50x per dollar</li>
           <li>Built the firm&apos;s first portfolio-wide performance framework with a four-person WashU team, tracking financial, workforce, and research KPIs across the book from public sources</li>
@@ -487,12 +494,13 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
         <div class="job-n"><span>2019 &mdash; 2025</span><span>Providence &middot; Boston</span></div>
         <div class="job-org">Off the desk</div>
         <div class="job-role">Providence College Club Hockey &middot; Moriarty &amp; Sons</div>
+        <p class="job-co">Where the work ethic comes from: the rink, the team, and summer jobs in the field.</p>
         <ul>
           <li>Played competitive hockey most of my life growing up in Maine and the Boston area, then two seasons on Providence College&apos;s ACHA club team</li>
-          <li>Spent five summers as a utility contractor at Moriarty &amp; Sons, replacing residential water service lines from lead to copper</li>
-          <li>Upgraded stormwater infrastructure across those five summers, meeting municipal safety and regulatory requirements on every job</li>
+          <li>Worked summers as a utility contractor at Moriarty &amp; Sons, replacing residential water service lines from lead to copper</li>
+          <li>Upgraded stormwater infrastructure on the same crews, meeting municipal safety and regulatory requirements on every job</li>
         </ul>
-        <span class="badge">ACHA club hockey &middot; Five summers in the field</span>
+        <span class="badge">ACHA club hockey &middot; Utility work in the field</span>
       </article>
     </div>
     <div class="hx-bar"><i id="hxBar"></i></div>
@@ -643,7 +651,7 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
       <div>
         <p class="about-big rv">Engineer by training, <span class="serif">finance</span> by obsession. <span class="mut">Big family, team guy, Boston sports lifer.</span></p>
         <p class="body rv">I&apos;m a senior at Washington University in St. Louis studying Financial Engineering and Data Science, graduating in May 2027. Before WashU, I studied Engineering Sciences with a minor in Mathematics at Providence College, so I know my way around complex systems.</p>
-        <p class="body rv">I grew up in Maine and the Boston area playing competitive hockey most of my life, including two seasons on Providence College&apos;s club team. I&apos;m one of five kids (plus a Cane Corso back home), which taught me early that life is better as part of a team. I also spent five summers on a utility crew at Moriarty &amp; Sons replacing lead water lines around Boston. Off the clock: the gym, my golf swing, and Boston sports.</p>
+        <p class="body rv">I grew up in Maine and the Boston area playing competitive hockey most of my life, including two seasons on Providence College&apos;s club team. I&apos;m one of five kids (plus a Cane Corso back home), which taught me early that life is better as part of a team. I also spent summers on a utility crew at Moriarty &amp; Sons replacing lead water lines around Boston. Off the clock: the gym, my golf swing, and Boston sports.</p>
         <div class="skills">
           <div class="sk-group rv"><h4>Finance</h4><div class="sk-list"><span>Financial Modeling</span><span>DCF Valuation</span><span>Comparable Analysis</span><span>Variance Analysis</span><span>Forecasting</span><span>Due Diligence</span><span>Project Finance</span><span>Equity Research</span></div></div>
           <div class="sk-group rv"><h4>Quant &amp; ML</h4><div class="sk-list"><span>Machine Learning</span><span>Mixed-Integer Optimization</span><span>Regression &amp; Inference</span><span>Backtesting</span><span>Portfolio Optimization</span><span>Options Pricing</span><span>NLP</span><span>PyTorch</span><span>scikit-learn</span></div></div>
