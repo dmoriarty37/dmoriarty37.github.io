@@ -1,0 +1,219 @@
+#include <iostream>
+#include <unistd.h>
+#include <sys/select.h>
+#include <termios.h>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+// Function to set the terminal to non-canonical mode (no Enter key required)
+void setTerminalToNonCanonicalMode() {
+    struct termios term;
+    
+    // Get the current terminal attributes
+    tcgetattr(STDIN_FILENO, &term);
+    
+    // Disable canonical mode and set other flags for non-blocking input
+    term.c_lflag &= ~ICANON;  // Disable canonical mode
+    term.c_lflag &= ~ECHO;    // Disable echo (optional)
+    term.c_cc[VMIN] = 1;      // Minimum number of characters to read (1 character)
+    term.c_cc[VTIME] = 0;     // Timeout for reading characters (0 means no timeout)
+    
+    // Apply the new settings
+    tcsetattr(STDIN_FILENO, TCSANOW, &term);
+}
+
+// Function to restore the terminal to its original settings
+void restoreTerminal() {
+    struct termios term;
+    
+    // Restore the terminal settings to default
+    tcgetattr(STDIN_FILENO, &term);
+    term.c_lflag |= ICANON;   // Re-enable canonical mode
+    term.c_lflag |= ECHO;     // Re-enable echo (optional)
+    tcsetattr(STDIN_FILENO, TCSANOW, &term);
+}
+
+// Function to get non-blocking input with a timeout of 0.2 seconds
+char getInputWithTimeout() {
+    struct timeval tv;
+    fd_set readfds;
+    char input = '\0';
+
+    // Set timeout to 0.4 seconds (200 milliseconds)
+    tv.tv_sec = 0;
+    tv.tv_usec = 200000; // 400,000 microseconds = 1 seconds
+
+    // Set up the file descriptor set for stdin
+    FD_ZERO(&readfds);
+    FD_SET(STDIN_FILENO, &readfds);
+
+    // Use select() to check for input availability with a timeout
+    int result = select(STDIN_FILENO + 1, &readfds, NULL, NULL, &tv);
+
+    if (result > 0) {
+        // If input is available, read it
+        read(STDIN_FILENO, &input, 1);
+    }
+
+    return input;
+}
+
+vector<vector<string>> Screen_Initial_Values(){
+    vector<vector<string>> screen(21,vector<string>(20));
+    int i, j;
+    
+    
+    //REDESIGN THIS TO MAKE IT LOOK HOW YOU WANT
+    //14 empty lines 21 spaces wide
+    for (j=0;j<15;j++){
+        for (i=0;i<21;i++){
+            screen[i][j] = " ";
+        }
+    }
+    
+    
+    //Now write level where character is
+    for (i=0;i<4;i++){screen[i][15]=" ";}
+    screen[4][14]="P";
+    for (i=5;i<21;i++){screen[i][15]=" ";}
+    
+    //Now Draw Ground with pit
+    for (j=15;j<19;j++){
+        for(i=0;i<7;i++){
+            screen[i][j]="X";
+        }
+        for(i=7;i<14;i++){
+            screen[i][j]=" ";
+        }
+        for(i=14;i<21;i++){
+            screen[i][j]="X";
+        }
+    }
+    for (i=0;i<21;i++){screen[i][19]="X";}
+    return screen;
+}
+
+
+void DrawScreenElement(string a){
+    cout << a;
+        
+}
+
+void NewScreenElement(bool person, bool falling_object){
+    
+    
+}
+
+int main(){
+    vector<vector<string>> screen = Screen_Initial_Values();
+    bool is_ground[21][20];
+    int i, j;
+    for (j=0;j<20;j++){
+        for (i=0; i<21;i++){
+            string b = screen[i][j];
+            if (b =="X"){is_ground[i][j]=1;}
+            else {is_ground[i][j]=0;}
+        }
+    }
+    
+    //Starting screen
+    cout << endl << endl << endl;
+    cout << "GAME:";
+    sleep(0.25);
+    cout <<" MIND THE GAP" << endl << endl;
+    sleep(0.5);
+    cout << "Instructions:" << endl;
+    cout << "Move the falling blocks to fill in the gap" << endl;
+    cout << "Get the person safely across" << endl << endl;
+    sleep(0.5);
+    cout << "  Controls:" << endl;
+    cout << "    block left = 'a'" << endl;
+    cout << "    block right = 'd'" << endl;
+    cout << "    man left = 'q'" << endl;
+    cout << "    man right = 'e'" << endl;
+    cout << "    man jump = 'a'" << endl << endl << endl;
+    cout << "To begin, click the screen and press enter";
+    string junk;
+    cin >> junk;
+    
+    
+    
+    bool person, falling_object;
+    bool hit=0;
+    int t;
+    int person_x=4; int person_y=14;
+    bool person_falling=0;
+    int person_fell=0;
+    bool jumped = 0;
+    bool crushed=0;
+    bool crashed=0;
+    int obj_x=10; int obj_y=0;
+    for (t=0; t<1200;t++){
+        
+        //Check if dead
+        if (obj_x == person_x and obj_y==person_y){crushed=1;}
+        if (crushed){
+            cout << endl << endl << endl << endl;
+            cout << "CRUSHED TO DEATH" << endl << endl;
+            cout << "YOU LOSE" << endl << endl;
+            return 1;
+        }
+        
+        sleep(0.1);
+        setTerminalToNonCanonicalMode();
+        // Get input with timeout
+        char userInput = getInputWithTimeout();
+        restoreTerminal();
+        
+        //Move or reset falling object
+        if (t%2) {obj_y++;};
+        if (userInput == 's' and (t+1)%2){obj_y++;}
+        if (hit) {obj_y=0; hit=0;}
+        
+        if (userInput == 'a'){obj_x--;}
+        if (userInput == 'd'){obj_x++;}
+        if (obj_x>20){obj_x=20;}
+        if (obj_y<0){obj_x=0;}
+        
+        //Move person
+        
+        //Move person left or right
+        if (userInput == 'q' and is_ground[person_x-1][person_y]==0){person_x--;}
+        if (userInput == 'e' and is_ground[person_x+1][person_y]==0){person_x++;}
+        
+        
+        //Draw Screen
+        for (j=0;j<20;j++){
+            for (i=0; i<21;i++){
+                string a;
+                if (is_ground[i][j]) {a="X";}
+                else {
+                    
+                    a=" ";
+                    if (i==obj_x and j==obj_y){
+                        a = "X";
+                        if (is_ground[i][j+1]){
+                            //This object hits ground
+                            is_ground[i][j]=1;
+                            hit=1;
+                        }
+                    }
+                    if (i==person_x and j==person_y){
+                        a="P";
+                    }
+                    }
+                        
+                    
+                
+                if (t>0){}
+                DrawScreenElement(a);
+                
+            }
+            cout << endl;
+        }
+    }
+     
+    return 0;
+}

@@ -1,0 +1,90 @@
+# people_generator_analysis.py
+# Topic: Synthetic Data Generation and Analysis
+
+from faker import Faker
+import pandas as pd
+import numpy as np
+
+fake = Faker()
+
+# read in state population data and compute each state's share of total population
+# this is used to weight random state assignment realistically
+states_populations = pd.read_csv('state_populations.csv')
+total_population = states_populations['Population'].sum()
+states_populations['population_percentage'] = states_populations['Population'] / total_population
+
+def generate_people(n: int) -> pd.DataFrame:
+    first_names = []
+    last_names = []
+    ages = []
+    states = []
+    sentences = []
+
+    for _ in range(n):
+        first_names.append(fake.first_name())
+        last_names.append(fake.last_name())
+        ages.append(fake.random_int(min=1, max=100))
+        # sample a state weighted by real population percentages so bigger states appear more often
+        states.append(np.random.choice(
+            states_populations['State'],
+            size=1,
+            p=states_populations['population_percentage']
+        )[0])
+        sentences.append(fake.sentence())
+
+    return pd.DataFrame({
+        'First Name': first_names,
+        'Last Name': last_names,
+        'Age': ages,
+        'State': states,
+        'Sentence': sentences
+    })
+
+# generate 200 fake people and save to csv
+df = generate_people(200)
+df.to_csv('people.csv', index=False)
+print('Saved to people.csv')
+print(df)
+
+# read the csv back in to confirm it saved correctly
+df = pd.read_csv('people.csv')
+print(df.head(200))
+
+# count how many people are from each state and grab the top 10
+top_10_pop = df['State'].value_counts().head(10)
+print(top_10_pop)
+
+# filter to only rows from the top 10 states
+# using copy() to avoid a SettingWithCopyWarning when adding new columns
+top_10_df = df[df['State'].isin(top_10_pop.index)].copy()
+
+# average age of people in the top 10 states
+average_age = top_10_df['Age'].mean()
+print(f'Average age: {average_age}')
+
+def share_a_letter(row):
+    # convert both names to sets of lowercase letters and check if they overlap
+    first = set(row['First Name'].lower())
+    last = set(row['Last Name'].lower())
+    return len(first.intersection(last)) > 0
+
+# apply the function row by row and store the result in a new column
+top_10_df['Share_a_Letter'] = top_10_df.apply(share_a_letter, axis=1)
+
+total_share = top_10_df['Share_a_Letter'].sum()
+print(f'People whose first and last name share a letter: {total_share}')
+
+def str_to_value(s: str) -> int:
+    # sum the ascii values of every character in the string to get a single numeric score
+    return sum(ord(char) for char in s)
+
+# score each sentence by its total ascii value
+top_10_df['Sentence ascii value'] = top_10_df['Sentence'].apply(str_to_value)
+print(top_10_df[['Sentence ascii value']].head())
+
+# find the 90th percentile cutoff for sentence ascii scores
+percentile_90th = top_10_df['Sentence ascii value'].quantile(0.9)
+sentences_above_90th = top_10_df[top_10_df['Sentence ascii value'] >= percentile_90th]
+
+print(f'The 90th percentile: {percentile_90th}')
+print(sentences_above_90th['State'].unique())

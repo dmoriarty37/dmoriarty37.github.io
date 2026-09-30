@@ -1,0 +1,407 @@
+# momentum_strategy.py
+# Topic: S&P 500 Momentum Strategy with Streamlit Interface
+
+
+import streamlit as st
+import pandas as pd
+import numpy as np
+import yfinance as yf
+import requests
+import io
+import math
+from datetime import datetime, timedelta
+import time
+
+
+# Strategy parameters used throughout the app
+SETTINGS = {
+    "max_per_sector": 3,       # max stocks allowed from any single sector
+    "slippage": 0.0015,        # estimated transaction cost per trade
+    "min_history_days": 120,   # minimum price history required to include a stock
+    "fetch_retry": 2,          # number of times to retry a failed download
+    "fetch_retry_delay": 1.0   # seconds to wait between retries
+}
+
+st.set_page_config(layout="wide", page_title="Momentum Strategy", initial_sidebar_state="expanded")
+st.title("S&P 500 Momentum Strategy")
+st.markdown("""
+This app fetches the S&P 500 universe, downloads price data via yfinance,
+computes momentum and volatility scores, ranks tickers, applies sector caps,
+and builds an equal-weighted portfolio.
+""")
+
+
+# Used if both Wikipedia and DataHub sources fail
+STATIC_UNIVERSE = [
+    "AAPL","MSFT","GOOGL","AMZN","NVDA","TSLA","META","JPM","V","UNH",
+    "HD","PG","JNJ","MA","ABBV","CVX","KO","PEP","AVGO","COST","WMT",
+    "DIS","MCD","ABT","TMO","ADBE","CRM","NKE","ACN","TXN","QCOM",
+    "DHR","HON","NEE","LOW","XOM","LLY","BAC","WFC","CSCO","ORCL","INTC","AMD","SBUX"
+]
+
+
+WIKI_URL = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
+DATAHUB_URL = "https://datahub.io/core/s-and-p-500-companies/r/constituents.csv"
+
+@st.cache_data
+def fetch_sp500_list(prefer="wiki", timeout=10):
+    """
+    Try to fetch the S&P 500 constituent list from Wikipedia, then DataHub.
+    Falls back to a static list if both sources fail.
+    Returns a list of tickers and a dict mapping ticker to sector.
+    """
+
+    def try_wiki():
+        try:
+            r = requests.get(WIKI_URL, timeout=timeout)
+            r.raise_for_status()
+            tables = pd.read_html(r.text)
+            for tbl in tables:
+                cols = [c.lower() for c in tbl.columns]
+                if 'symbol' not in cols:
+                    continue
+                sym_col = tbl.columns[cols.index('symbol')]
+                sector_col = next(
+                    (tbl.columns[i] for i, c in enumerate(cols) if 'gics' in c and 'sector' in c),
+                    None
+                )
+                tickers = tbl[sym_col].astype(str).str.replace(r"\.", "-", regex=True).str.strip().tolist()
+                sector_map = {}
+                if sector_col is not None:
+                    for t, s in zip(tbl[sym_col].astype(str), tbl[sector_col].astype(str)):
+                        sector_map[t.replace(".", "-")] = s
+                return tickers, sector_map
+        except Exception:
+            return None
+
+    def try_datahub():
+        try:
+            r = requests.get(DATAHUB_URL, timeout=timeout)
+            r.raise_for_status()
+            df = pd.read_csv(io.StringIO(r.text))
+            if 'Symbol' not in df.columns:
+                return None
+            tickers = df['Symbol'].astype(str).str.replace(r"\.", "-", regex=True).str.strip().tolist()
+            sector_map = {}
+            if 'Sector' in df.columns:
+                for t, s in zip(df['Symbol'].astype(str), df['Sector'].astype(str)):
+                    sector_map[t.replace(".", "-")] = s
+            return tickers, sector_map
+        except Exception:
+            return None
+
+    # Try preferred source first, then fall back to the other
+    result = try_wiki() if prefer == "wiki" else try_datahub()
+    if result:
+        return result
+    result = try_datahub() if prefer == "wiki" else try_wiki()
+    if result:
+        return result
+
+    # Both sources failed, use the static universe
+    return STATIC_UNIVERSE.copy(), {t: "Unknown" for t in STATIC_UNIVERSE}
+
+
+@st.cache_data
+def fetch_prices(tickers, start_dt, end_dt, auto_adjust=True, threads=True):
+    """
+    Download adjusted closing prices for a list of tickers via yfinance.
+    Tries a bulk download first, then falls back to per-ticker downloads
+    for any that fail. Returns a dict mapping ticker to a price Series.
+    """
+    prices_out = {}
+
+    # Attempt bulk download for efficiency
+    try:
+        df = yf.download(
+            tickers, start=start_dt, end=end_dt,
+            group_by='column', auto_adjust=auto_adjust,
+            threads=threads, progress=False
+        )
+        if isinstance(df.columns, pd.MultiIndex):
+            for t in tickers:
+                if ('Adj Close', t) in df.columns:
+                    series = df[('Adj Close', t)].dropna()
+                elif ('Close', t) in df.columns:
+                    series = df[('Close', t)].dropna()
+                else:
+                    series = pd.Series(dtype=float)
+                if not series.empty:
+                    prices_out[t] = series
+        else:
+            col = 'Adj Close' if 'Adj Close' in df.columns else 'Close'
+            prices_out[tickers[0]] = df[col].dropna()
+    except Exception:
+        pass
+
+    # Per-ticker fallback for any missing tickers
+    for t in tickers:
+        if t in prices_out and not prices_out[t].empty:
+            continue
+        for attempt in range(SETTINGS["fetch_retry"]):
+            try:
+                tk = yf.Ticker(t)
+                hist = tk.history(start=start_dt, end=end_dt, auto_adjust=auto_adjust)
+                if hist is None or hist.empty:
+                    time.sleep(SETTINGS["fetch_retry_delay"])
+                    continue
+                col = 'Close' if 'Close' in hist.columns else hist.columns[0]
+                s = hist[col].dropna()
+                if not s.empty:
+                    prices_out[t] = s
+                    break
+            except Exception:
+                time.sleep(SETTINGS["fetch_retry_delay"])
+        if t not in prices_out:
+            prices_out[t] = pd.Series(dtype=float)
+
+    return prices_out
+
+
+def calculate_volatility(prices):
+    """Annualized volatility from daily returns. Returns NaN if not enough data."""
+    returns = prices.pct_change().dropna()
+    if len(returns) < 10:
+        return np.nan
+    return float(max(1e-6, min(returns.std() * math.sqrt(252), 5.0)))
+
+
+def simple_momentum(prices, days):
+    """Simple price return over the lookback window."""
+    clean = prices.dropna()
+    if len(clean) < days + 1:
+        return np.nan
+    tail = clean.tail(days + 1)
+    start, end = tail.iloc[0], tail.iloc[-1]
+    if start <= 0 or end <= 0:
+        return np.nan
+    return float((end / start) - 1.0)
+
+
+def annualize_return(period_return, period_days):
+    """Convert a raw period return to an annualized figure."""
+    if period_return is None or np.isnan(period_return):
+        return np.nan
+    try:
+        return float((1 + period_return) ** (252.0 / period_days) - 1.0)
+    except Exception:
+        return np.nan
+
+
+def regression_momentum(prices, days):
+    """
+    Estimate momentum via log-linear regression slope over the lookback window.
+    Annualizes the slope to get a comparable momentum measure.
+    """
+    clean = prices.dropna().tail(days)
+    if len(clean) < max(10, int(days * 0.5)):
+        return np.nan
+    x = np.arange(len(clean))
+    y = np.log(clean.values)
+    if not np.all(np.isfinite(y)):
+        return np.nan
+    slope = np.polyfit(x, y, 1)[0]
+    return float(np.expm1(slope * 252.0))
+
+
+col1, col2, col3 = st.columns(3)
+with col1:
+    start_date = st.date_input("Start Date", value=datetime(2018, 1, 1).date())
+    portfolio_size = st.number_input("Portfolio Size ($)", min_value=1000, value=100_000, step=1000)
+with col2:
+    end_date = st.date_input("End Date", value=datetime.now().date())
+    strategy_type = st.selectbox("Strategy Type", ["Simple Momentum", "Regression Momentum"])
+with col3:
+    top_percent = st.slider("Top % of Stocks to Select", 5, 50, 15)
+    lookback_days = st.selectbox("Lookback Period (days)", [21, 42, 63, 84, 126], index=3)
+
+seed = st.number_input("Random seed", value=42, step=1)
+use_dynamic = st.checkbox("Fetch live S&P 500 list from web", value=True)
+validate_with_yf = st.checkbox("Validate tickers with yfinance before downloading all data", value=True)
+
+if start_date >= end_date:
+    st.error("Start date must be before end date.")
+    st.stop()
+
+
+if use_dynamic:
+    with st.spinner("Fetching S&P 500 list..."):
+        tickers, sector_map = fetch_sp500_list()
+        st.success(f"Fetched {len(tickers)} tickers.")
+else:
+    tickers = STATIC_UNIVERSE.copy()
+    sector_map = {t: "Unknown" for t in tickers}
+    st.info("Using static fallback universe.")
+
+start_dt = pd.to_datetime(start_date)
+end_dt = pd.to_datetime(end_date) + pd.Timedelta(days=1)
+
+if validate_with_yf:
+    with st.spinner("Validating tickers..."):
+        prices_quick = fetch_prices(tickers, start_dt, end_dt)
+        valid_tickers = [
+            t for t, s in prices_quick.items()
+            if not s.empty and (s.index[-1] - s.index[0]).days >= SETTINGS["min_history_days"]
+        ]
+        st.success(f"{len(valid_tickers)} valid tickers found.")
+else:
+    valid_tickers = tickers.copy()
+
+if not valid_tickers:
+    st.error("No valid tickers found. Try expanding the date range.")
+    st.stop()
+
+
+if 'portfolio_data' not in st.session_state:
+    st.session_state.portfolio_data = None
+
+if st.button("Run Momentum Strategy"):
+    with st.spinner("Downloading price data..."):
+        prices_dict = fetch_prices(valid_tickers, start_dt, end_dt)
+
+    rows = []
+    progress = st.progress(0)
+    total = len(prices_dict)
+
+    for i, t in enumerate(valid_tickers):
+        progress.progress((i + 1) / total)
+        prices = prices_dict.get(t, pd.Series(dtype=float)).sort_index()
+
+        if prices.empty or (prices.index[-1] - prices.index[0]).days < SETTINGS["min_history_days"]:
+            continue
+
+        vol = calculate_volatility(prices)
+
+        if strategy_type == "Simple Momentum":
+            raw = simple_momentum(prices, lookback_days)
+            mom = annualize_return(raw, lookback_days)
+        else:
+            mom = regression_momentum(prices, lookback_days)
+
+        if np.isnan(mom) or np.isnan(vol) or vol == 0.0:
+            continue
+
+        rows.append({
+            'Ticker': t,
+            'Sector': sector_map.get(t, "Unknown"),
+            'Price': float(prices.iloc[-1]),
+            'Momentum_Annual': mom,
+            'Volatility_Annual': vol,
+            'Risk_Adj_Momentum': mom / vol,
+            'Data_Points': len(prices)
+        })
+
+    progress.empty()
+    df = pd.DataFrame(rows)
+
+    if df.empty:
+        st.error("No tickers with sufficient data. Try expanding the date range.")
+        st.stop()
+
+    # Rank stocks by risk-adjusted momentum
+    df['Momentum_Rank'] = df['Risk_Adj_Momentum'].rank(ascending=False, method='first')
+    n_stocks = max(5, int(len(df) * top_percent / 100))
+    candidates = df.nlargest(min(n_stocks * 3, len(df)), 'Risk_Adj_Momentum').copy()
+
+    # Apply sector cap: no more than max_per_sector stocks from any one sector
+    selected = []
+    sector_counts = {}
+    for _, row in candidates.iterrows():
+        sec = row['Sector']
+        if sector_counts.get(sec, 0) < SETTINGS["max_per_sector"]:
+            selected.append(row)
+            sector_counts[sec] = sector_counts.get(sec, 0) + 1
+            if len(selected) >= n_stocks:
+                break
+
+    if len(selected) < 3:
+        selected = candidates.head(max(3, n_stocks)).to_dict('records')
+
+    portfolio_df = pd.DataFrame(selected).reset_index(drop=True)
+
+    # Equal weight allocation
+    portfolio_df['Target_Weight'] = 1.0 / len(portfolio_df)
+    portfolio_df['Target_Allocation'] = portfolio_df['Target_Weight'] * portfolio_size
+
+    # Compute whole share counts and distribute leftover cash
+    portfolio_df['Shares'] = np.floor(portfolio_df['Target_Allocation'] / portfolio_df['Price']).astype(int)
+    invested = (portfolio_df['Shares'] * portfolio_df['Price']).sum()
+    leftover = portfolio_size - invested
+
+    for idx in portfolio_df.sort_values('Risk_Adj_Momentum', ascending=False).index:
+        price = portfolio_df.at[idx, 'Price']
+        if leftover >= price:
+            add = int(leftover // price)
+            portfolio_df.at[idx, 'Shares'] += add
+            leftover -= add * price
+
+    portfolio_df['Final_Value'] = portfolio_df['Shares'] * portfolio_df['Price']
+    total_val = portfolio_df['Final_Value'].sum()
+    portfolio_df['Final_Weight'] = portfolio_df['Final_Value'] / total_val
+
+    st.session_state.portfolio_data = portfolio_df
+
+    # Summary metrics
+    st.markdown("### Portfolio Summary")
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Tickers Analyzed", len(df))
+    c2.metric("Selected Stocks", len(portfolio_df))
+    c3.metric("Avg Risk-Adj Momentum", f"{portfolio_df['Risk_Adj_Momentum'].mean():.3f}")
+    c4.metric("Sectors", len(portfolio_df['Sector'].unique()))
+
+    # Display portfolio table
+    display_df = portfolio_df[['Ticker','Sector','Price','Shares','Final_Value','Final_Weight','Risk_Adj_Momentum']].copy()
+    display_df['Price'] = display_df['Price'].apply(lambda x: f"${x:,.2f}")
+    display_df['Final_Value'] = display_df['Final_Value'].apply(lambda x: f"${x:,.2f}")
+    display_df['Final_Weight'] = display_df['Final_Weight'].apply(lambda x: f"{x:.1%}")
+    display_df['Risk_Adj_Momentum'] = display_df['Risk_Adj_Momentum'].apply(lambda x: f"{x:.3f}")
+    st.dataframe(display_df.sort_values('Final_Value', ascending=False), use_container_width=True)
+
+    # Sector allocation summary
+    st.markdown("### Sector Allocation")
+    sector_summary = portfolio_df.groupby('Sector').agg(
+        Stocks=('Ticker', 'count'),
+        Allocation=('Final_Value', 'sum')
+    ).sort_values('Allocation', ascending=False)
+    sector_summary['Weight'] = (sector_summary['Allocation'] / sector_summary['Allocation'].sum()).apply(lambda x: f"{x:.1%}")
+    sector_summary['Allocation'] = sector_summary['Allocation'].apply(lambda x: f"${x:,.0f}")
+    st.dataframe(sector_summary, use_container_width=True)
+
+    # Export buttons
+    def to_excel(df_export):
+        output = io.BytesIO()
+        try:
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                df_export.to_excel(writer, sheet_name='Portfolio', index=False)
+            return output.getvalue()
+        except Exception:
+            return None
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        xlsx = to_excel(portfolio_df)
+        if xlsx:
+            st.download_button("Download Excel", data=xlsx,
+                               file_name="momentum_portfolio.xlsx",
+                               mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    with col2:
+        st.download_button("Download CSV", data=portfolio_df.to_csv(index=False).encode(),
+                           file_name="momentum_portfolio.csv", mime="text/csv")
+    with col3:
+        st.download_button("Download JSON", data=portfolio_df.to_json(orient='records', indent=2),
+                           file_name="momentum_portfolio.json", mime="application/json")
+
+    st.success("Done!")
+
+else:
+    st.info("Set your parameters above and press Run to build the portfolio.")
+
+# Sidebar summary of current portfolio
+if st.session_state.portfolio_data is not None:
+    p = st.session_state.portfolio_data
+    st.sidebar.markdown("### Current Portfolio")
+    st.sidebar.metric("Stocks", len(p))
+    st.sidebar.metric("Avg Risk-Adj", f"{p['Risk_Adj_Momentum'].mean():.3f}")
+    st.sidebar.markdown("Top holdings:")
+    for _, r in p.head(5).iterrows():
+        st.sidebar.text(f"{r['Ticker']}: {int(r['Shares'])} shares ({float(r['Final_Weight']):.1%})")

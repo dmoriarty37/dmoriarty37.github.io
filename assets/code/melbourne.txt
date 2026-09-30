@@ -1,0 +1,521 @@
+# Initialize Otter
+
+import os
+os.environ["OMP_NUM_THREADS"] = "1" # run this first!
+
+
+import pandas as pd
+
+#Load the data
+data = pd.read_csv('./utility/data/melb_data.csv')
+
+#shows some dataset info
+data.info()
+
+#some summary statistics for numerical features
+data.describe()
+
+#displays dataframe
+data
+
+!conda install numba==0.58.1
+
+# importing the Profile Report module
+from ydata_profiling import ProfileReport
+
+
+#This generates the data profile report
+profile = data.profile_report(correlations= {
+        "pearson": {"calculate": True}, # Keep Pearson
+        "spearman": {"calculate": False}, # Keep Pearson
+        "kendall": {"calculate": False}, # Disable Kendall
+        "phi_k": {"calculate": False}, # Disable Phi_k
+        "cramers": {"calculate": False}, # Disable Cramer's V
+    }
+)
+
+profile
+
+# 
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+%matplotlib inline
+
+#calculates average price for each number of rooms
+avgPrice_by_numberRooms = data.groupby('Rooms')['Price'].mean().reset_index()
+
+#plot
+sns.barplot(x='Rooms', y='Price', data=avgPrice_by_numberRooms)
+plt.title("Average Selling Price by Number of Rooms")
+plt.xlabel("Number of Rooms")
+plt.ylabel("Average Price")
+plt.show()
+
+sns.barplot(x='Bedroom2', y='Price',data=data)
+plt.title("Number of Bedrooms vs Price")
+plt.xlabel("Number of Bedrooms")
+plt.ylabel("Price")
+plt.show()
+
+sns.barplot(data=data, x='Regionname', y='Price')
+plt.xticks(rotation=45)
+plt.title("House Price Distribution by Region")
+plt.show()
+
+# Import libraries
+from sklearn.model_selection import train_test_split, KFold
+
+# defining Target variable
+y = data['Price']
+
+#remove features that are not immediately usable 
+X = data.drop(['Price', 'Address', 'Longtitude', 'Lattitude', 'Postcode','CouncilArea', 'SellerG'], axis=1)
+
+#Train-test split (80% train, 20% test)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+
+kf = KFold(n_splits=5, shuffle=True, random_state=42)
+
+#show what we have above
+X_train.shape, X_test.shape, y_train.shape, y_test.shape
+
+#Just to see the training dataset
+X_train
+
+#
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.impute import SimpleImputer
+
+
+# defining preprocessing pipelines
+# Numeric features
+numeric_features =  list(X_train.select_dtypes(include=['int64','float64']).columns)
+
+numeric_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='median')),  # imputes missing numeric values with median
+    ('scaler', StandardScaler())  # scales features for models like KNN or Neural Networks
+])
+
+# Categorical features
+categorical_features = X_train.select_dtypes(include=['object']).columns
+
+categorical_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='most_frequent')),  # imputes missing categorical values
+    ('onehot', OneHotEncoder(handle_unknown='ignore'))  # one-hot encode categories
+])
+
+# have to now Combine pipelines into a preprocessor
+preprocessor = ColumnTransformer(transformers=[
+    ('num', numeric_transformer, numeric_features),
+    ('cat', categorical_transformer, categorical_features)
+])
+
+# now Fit the preprocessor on training data and transform both train and test sets
+X_train_processed = preprocessor.fit_transform(X_train)
+X_test_processed = preprocessor.transform(X_test)
+
+#
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import numpy as np
+
+# This involves my categorical + numerical transformations and scales the final numeric features
+linear_model = Pipeline(steps=[('preprocessor', preprocessor),('model', LinearRegression())])
+
+#train model
+linear_model.fit(X_train, y_train)
+
+
+#predict on test dataset
+y_pred = linear_model.predict(X_test)
+
+#below are calculations to see how trustworthy/useful/accurate the model is
+
+#Root mean squared error calc
+rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+#r^2 calc
+r2 = r2_score(y_test, y_pred)
+
+print("Linear Regression Results:")
+print(f"RMSE: {rmse:.4f}")
+print(f"R^2: {r2:.4f}")
+
+#
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.model_selection import GridSearchCV
+
+# build  a full pipeline from preprocessing to model as we did before
+knn_model = Pipeline(steps=[('preprocessor', preprocessor),('model', KNeighborsRegressor())])
+
+# defining the hyperparameter grid for tuning the n_neighbors
+hyperparameters = {'model__n_neighbors':  [3, 5, 7, 9, 11, 13, 15, 20, 25, 30, 35, 40]}
+
+grid_search = GridSearchCV(knn_model,hyperparameters,cv=kf,scoring="neg_root_mean_squared_error",n_jobs=-1)
+
+grid_search.fit(X_train, y_train)
+
+#print the best hyperparameters
+print("Best hyperparameters:", grid_search.best_params_)
+
+#now predict on test dataset using the best model
+y_pred = grid_search.predict(X_test)
+
+#find performance results
+rmse_knn = np.sqrt(mean_squared_error(y_test, y_pred))
+r2_knn = r2_score(y_test, y_pred)
+
+print("KNN Regression Results:")
+print("RMSE:", rmse_knn)
+print("R^2:", r2_knn)
+
+
+#importing the Decision Tree Regressor
+from sklearn.tree import DecisionTreeRegressor
+
+#build a pipeline like done above from preprocessing to decision tree model 
+dt_pipeline = Pipeline(steps=[ ('preprocessor', preprocessor), ('model', DecisionTreeRegressor(random_state=24))])
+
+# defining a hyperparameter grid for tuning 
+# note that i am allowing ulimited tree depth, controling how many samples needed to split a node
+#and the minimum sample requried at leaf node
+dt_hyperparam = {'model__max_depth': [3, 5, 7, 10, 15, 20, None],'model__min_samples_split': [2, 5, 10],'model__min_samples_leaf': [1, 2, 4]}
+
+# tune hyperparameters with cross-validation 
+dt_grid = GridSearchCV( dt_pipeline,dt_hyperparam, cv=kf,scoring="neg_root_mean_squared_error", n_jobs=-1)
+dt_grid.fit(X_train, y_train)
+
+
+print("Best Decision Tree hyperparameters:", dt_grid.best_params_)
+
+
+y_pred = dt_grid.predict(X_test)
+
+#find performance results
+rmse_dt = np.sqrt(mean_squared_error(y_test, y_pred))
+r2_dt = r2_score(y_test, y_pred)
+
+
+print("Decision Tree Regression Results:")
+print("RMSE:", rmse_dt)
+print("R^2:", r2_dt)
+
+
+from sklearn.ensemble import RandomForestRegressor
+
+#pipeline for preprocessing
+rf_pipeline = Pipeline(steps=[('preprocessor', preprocessor),('model', RandomForestRegressor(random_state=24))])
+
+#defining hyperparemeter grid 
+rf_hyperparam  = {'model__n_estimators': [100, 200, 300],'model__max_depth': [None, 10, 20],'model__min_samples_split': [2, 5, 10],'model__min_samples_leaf': [1, 2, 4]}
+
+rf_grid  = GridSearchCV(rf_pipeline, rf_hyperparam, cv=kf,scoring="neg_root_mean_squared_error", n_jobs=-1)
+
+rf_grid.fit(X_train, y_train)
+
+print("Best hyperparameters:", rf_grid.best_params_)
+
+#predict using test set
+y_pred = rf_grid.predict(X_test)
+
+#find performance results
+rmse_rf = np.sqrt(mean_squared_error(y_test, y_pred))
+r2_rf = r2_score(y_test, y_pred)
+
+
+print("Random Forest Regression Results:")
+print("RMSE:", rmse_rf)
+print("R^2:", r2_rf)
+
+
+#Copy of the training and test sets so i don't change the original data
+X_train_for_fe = X_train.copy()
+X_test_for_fe = X_test.copy()
+
+#Measure how much of the land is built-up
+#due to missing data in the original dataset Building_to_Land_Ratio has a lot of NaNs (5129/10864) so we will use mediean to represent typical properrty value and prevent dropping thousands of rows
+building_median = X_train_for_fe['BuildingArea'].median()
+land_median = X_train_for_fe['Landsize'].median()
+X_train_for_fe['Building_to_Land_Ratio'] = (X_train_for_fe['BuildingArea'].fillna(building_median) / X_train_for_fe['Landsize'].fillna(land_median).replace(0,1))
+X_test_for_fe['Building_to_Land_Ratio'] = (X_test_for_fe['BuildingArea'].fillna(building_median) / X_test_for_fe['Landsize'].fillna(land_median).replace(0,1))
+
+#sale year metric to show what the market conditions werelike at the time of a sale
+X_train_for_fe['Sale_Year'] = pd.to_datetime(X_train_for_fe['Date'], dayfirst=True).dt.year
+X_test_for_fe['Sale_Year'] = pd.to_datetime(X_test_for_fe['Date'], dayfirst=True).dt.year
+
+
+#sale month metric just to see possible seasonal effects in the house prices
+X_train_for_fe['Sale_Month'] = pd.to_datetime(X_train_for_fe['Date'], dayfirst=True).dt.month
+X_test_for_fe['Sale_Month'] = pd.to_datetime(X_test_for_fe['Date'], dayfirst=True).dt.month
+
+#bathroom per bedroom metric as I beleive homes with more bathrooms relative to homes are more attractive to buyers
+X_train_for_fe['BathroomPerBedroom'] = X_train_for_fe['Bathroom'] / X_train_for_fe['Bedroom2'].replace(0, 1)
+X_test_for_fe['BathroomPerBedroom'] = X_test_for_fe['Bathroom'] / X_test_for_fe['Bedroom2'].replace(0, 1)
+
+#print all the metircs to make sure they were created
+print(X_train_for_fe[[ 'Building_to_Land_Ratio', 'Sale_Year', 'Sale_Month', 'BathroomPerBedroom']])
+
+num_missing_train = X_train_for_fe['Building_to_Land_Ratio'].isna().sum()
+print("Number of missing values in training set:", num_missing_train)
+
+
+#make a copy so I don't mess with feature engineering dataset
+X_train_fs = X_train_for_fe.copy()
+X_test_fs = X_test_for_fe.copy()
+
+#preprocessing using pieline
+numeric_features = X_train_fs.select_dtypes(include=['int64','float64']).columns
+categorical_features = X_train_fs.select_dtypes(include=['object']).columns
+
+preprocessor = ColumnTransformer(transformers=[
+    ('num', SimpleImputer(strategy='median'), numeric_features),
+    ('cat', OneHotEncoder(handle_unknown='ignore', sparse=False), categorical_features)
+])
+
+X_train_processed = preprocessor.fit_transform(X_train_fs)
+X_test_processed = preprocessor.transform(X_test_fs)
+
+#need to get the feature names now
+feature_names = preprocessor.get_feature_names_out()
+
+#This is where I fit random forest regressor on the processed data
+rf = RandomForestRegressor(n_estimators=300, random_state=42, n_jobs=-1)
+rf.fit(X_train_processed, y_train)
+
+#Get the importace score from training with random forest
+importances = pd.Series(rf.feature_importances_, index=feature_names).sort_values(ascending=False)
+best_features = importances.head(20)
+print(best_features.head(20))
+
+top_features_df = best_features.head(20).index.tolist()
+print("The Top 20 Features ordered by importance:")
+print(top_features_df)
+
+
+#results from above are a bit messy so I am mapping features back to original columns
+#I did not map back categorical columns because the one hot encoder columns make it unclear and isleading
+selected_feats = []
+for f in best_features.index:
+    if f.startswith('num__'):
+        selected_feats.append(f.replace('num__', ''))
+print('\nSelected features:')
+print(selected_feats)
+
+#now we can create dataset for selected features
+X_train_sel = pd.DataFrame(X_train_processed, columns=feature_names)[best_features.index].copy()
+X_test_sel = pd.DataFrame(X_test_processed, columns=feature_names)[best_features.index].copy()
+
+print(f"\nShape of selected training set: {X_train_sel.shape}")
+print(f"Shape of selected test set: {X_test_sel.shape}")
+
+
+#make sure i use copy of featured engineered datasets
+X_train_fe = X_train_for_fe.copy()
+X_test_fe = X_test_for_fe.copy()
+
+#indetify and speperate the numerical and categorical features
+num_feats = X_train_fe.select_dtypes(include= ['int64', 'float64']).columns
+cat_feats = X_train_fe.select_dtypes(include = ['object']).columns
+
+#first i need to define the pipelines
+num_transformer = Pipeline(steps = [('imputer', SimpleImputer(strategy='median')), ('scaler', StandardScaler())])
+cat_transformer = Pipeline(steps = [('imputer', SimpleImputer(strategy='most_frequent')), ('encoder', OneHotEncoder(handle_unknown="ignore"))])
+
+#now i can combine both transformers for numerical and categorical
+preprocessor_fe =  ColumnTransformer(transformers=[('num', num_transformer, num_feats),('cat', cat_transformer, cat_feats)])
+
+#now i will fit the preprocessor on the fe training set and trasnform both train and test set
+X_train_fe_processed = preprocessor_fe.fit_transform(X_train_fe)
+X_test_fe_processed = preprocessor_fe.transform(X_test_fe)
+
+
+# This involves my categorical + numerical transformations and scales the final numeric features
+linear_model = Pipeline(steps=[('preprocessor', preprocessor_fe),('model', LinearRegression())])
+
+#train model
+linear_model.fit(X_train_fe, y_train)
+
+
+#predict on fe test dataset
+y_pred = linear_model.predict(X_test_fe)
+
+#below are calculations to see how trustworthy/useful/accurate the model is
+
+#Root mean squared error calc
+rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+#r^2 calc
+r2 = r2_score(y_test, y_pred)
+
+print("Linear Regression Results:")
+print(f"RMSE: {rmse:.4f}")
+print(f"R^2: {r2:.4f}")
+
+
+# build  a full pipeline from preprocessing to model as we did before
+knn_model = Pipeline(steps=[('preprocessor', preprocessor_fe),('model', KNeighborsRegressor())])
+
+# defining the hyperparameter grid for tuning the n_neighbors
+hyperparameters = {'model__n_neighbors':  [3, 5, 7, 9, 11, 13, 15, 20, 25, 30, 35, 40]}
+
+grid_search = GridSearchCV(knn_model,hyperparameters,cv=kf,scoring="neg_root_mean_squared_error",n_jobs=-1)
+
+grid_search.fit(X_train_fe, y_train)
+
+#print the best hyperparameters
+print("Best hyperparameters:", grid_search.best_params_)
+
+#now predict on test dataset using the best model
+y_pred = grid_search.predict(X_test_fe)
+
+#find performance results
+rmse_knn = np.sqrt(mean_squared_error(y_test, y_pred))
+r2_knn = r2_score(y_test, y_pred)
+
+print("KNN Regression Results:")
+print("RMSE:", rmse_knn)
+print("R^2:", r2_knn)
+
+
+#build a pipeline like done above from preprocessing to decision tree model 
+dt_pipeline = Pipeline(steps=[ ('preprocessor', preprocessor_fe), ('model', DecisionTreeRegressor(random_state=24))])
+
+# defining a hyperparameter grid for tuning 
+# note that i am allowing ulimited tree depth, controling how many samples needed to split a node
+#and the minimum sample requried at leaf node
+dt_hyperparam = {'model__max_depth': [3, 5, 7, 10, 15, 20, None],'model__min_samples_split': [2, 5, 10],'model__min_samples_leaf': [1, 2, 4]}
+
+# tune hyperparameters with cross-validation 
+dt_grid = GridSearchCV( dt_pipeline,dt_hyperparam, cv=kf,scoring="neg_root_mean_squared_error", n_jobs=-1)
+dt_grid.fit(X_train_fe, y_train)
+
+
+print("Best Decision Tree hyperparameters:", dt_grid.best_params_)
+
+
+y_pred = dt_grid.predict(X_test_fe)
+
+#find performance results
+rmse_dt = np.sqrt(mean_squared_error(y_test, y_pred))
+r2_dt = r2_score(y_test, y_pred)
+
+
+print("Decision Tree Regression Results:")
+print("RMSE:", rmse_dt)
+print("R^2:", r2_dt)
+
+
+#pipeline for preprocessing
+rf_pipeline = Pipeline(steps=[('preprocessor', preprocessor_fe),('model', RandomForestRegressor(random_state=24))])
+
+#defining hyperparemeter grid 
+rf_hyperparam  = {'model__n_estimators': [100, 200, 300],'model__max_depth': [None, 10, 20],'model__min_samples_split': [2, 5, 10],'model__min_samples_leaf': [1, 2, 4]}
+
+rf_grid  = GridSearchCV(rf_pipeline, rf_hyperparam, cv=kf,scoring="neg_root_mean_squared_error", n_jobs=-1)
+
+rf_grid.fit(X_train_fe, y_train)
+
+print("Best hyperparameters:", rf_grid.best_params_)
+
+#predict using test set
+y_pred = rf_grid.predict(X_test_fe)
+
+#find performance results
+rmse_rf = np.sqrt(mean_squared_error(y_test, y_pred))
+r2_rf = r2_score(y_test, y_pred)
+
+
+print("Random Forest Regression Results:")
+print("RMSE:", rmse_rf)
+print("R^2:", r2_rf)
+
+import numpy as np
+
+#RSME from baseline models
+rmse_lr_base = 351346.8876
+rmse_knn_base = 328690.2679061833
+rmse_dt_base = 333029.1397846323
+rmse_rf_base = 277698.90686486784
+
+#RSME from featured Engineered models
+
+rmse_lr_fe = 342993.8021      
+rmse_knn_fe = 338251.02784288616
+rmse_dt_fe = 340869.05280218227 
+rmse_rf_fe = 279357.9553976346
+
+#make list of model names and rsme scores to easily compare when I plot
+models = ["Linear Regression", "KNN", "Decision Tree", "Random Forest"]
+rmse_base = [rmse_lr_base, rmse_knn_base, rmse_dt_base, rmse_rf_base]
+rmse_fe = [rmse_lr_fe, rmse_knn_fe, rmse_dt_fe, rmse_rf_fe]
+
+#plot of baseline RMSE values
+plt.bar(models, rmse_base)
+plt.title('Comparing RMSE for Baseline Models')
+plt.ylabel('RMSE')
+plt.show()
+
+#plot of feature engineered RMSE values
+plt.bar(models, rmse_base)
+plt.title('Comparing RMSE for Featured Engineered Models')
+plt.ylabel('RMSE')
+plt.show()
+
+#plot of feature engineered RMSE vs baseline RMSE values
+plt.figure(figsize=(12,6))
+x=np.arange(len(models))
+width = 0.25
+plt.bar(x - width/2,  rmse_base, width, label='Baseline Models')
+plt.bar(x + width/2, rmse_fe, width, label='Feature Engineered Models')
+plt.title("Baseline vs Feature-Engineered RMSE")
+plt.xticks(x, models)
+plt.ylabel("RMSE")
+plt.legend()
+plt.show()
+
+
+#now everything for like above for r^2
+
+#RSME from baseline models
+r2_lr_base = 0.6892
+r2_knn_base = 0.7280122757182756
+r2_dt_base = 0.7207841397905393 
+r2_rf_base = 0.8058560090801088
+
+#RSME from featured Engineered models
+
+r2_lr_fe =  0.7038
+r2_knn_fe = 0.7119592968115345
+r2_dt_fe = 0.7074832361118386
+r2_rf_fe = 0.8035293420704333
+
+#make list of model names and rsme scores to easily compare when I plot
+models = ["Linear Regression", "KNN", "Decision Tree", "Random Forest"]
+r2_base = [r2_lr_base, r2_knn_base, r2_dt_base, r2_rf_base]
+r2_fe = [r2_lr_fe, r2_knn_fe, r2_dt_fe, r2_rf_fe]
+
+#plot of baseline RMSE values
+plt.bar(models, r2_base)
+plt.title('Comparing R^2 for Baseline Models')
+plt.ylabel('R^2')
+plt.show()
+
+#plot of feature engineered RMSE values
+plt.bar(models, r2_base)
+plt.title('Comparing R^2 for Featured Engineered Models')
+plt.ylabel('R^2')
+plt.show()
+
+#plot of feature engineered r2 vs baseline r2 values
+plt.figure(figsize=(12,6))
+x=np.arange(len(models))
+width = 0.25
+plt.bar(x - width/2,  r2_base, width, label='Baseline Models')
+plt.bar(x + width/2, r2_fe, width, label='Feature Engineered Models')
+plt.title("Baseline vs Feature-Engineered R^2")
+plt.xticks(x, models)
+plt.ylabel("R^2")
+plt.legend()
+plt.show()

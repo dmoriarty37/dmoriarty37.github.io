@@ -1,0 +1,552 @@
+# news_sentiment_predictor.py
+#
+# Install:
+#   pip install yfinance requests textblob scikit-learn joblib pandas numpy
+#   python -m textblob.download_corpora    (one-time setup)
+#
+# Run:
+#   python news_sentiment_predictor.py
+#
+# NOTE ON SOURCES
+# Only Google News RSS works reliably without auth, JS rendering, or rate limiting.
+# The script compensates by firing 20+ targeted search queries across every sector,
+# which typically yields 150-250 unique ticker-bearing headlines per run.
+# Yahoo Finance, MarketWatch, Reuters, and Reddit are attempted as bonus sources
+# but silently skipped if they fail (which they often do).
+
+import os
+import re
+import time
+import logging
+import warnings
+import xml.etree.ElementTree as ET
+from datetime import datetime, timedelta
+from typing import List, Dict
+from collections import Counter
+from urllib.parse import quote_plus
+
+import requests
+import pandas as pd
+import numpy as np
+from textblob import TextBlob
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import classification_report, accuracy_score
+import yfinance as yf
+import joblib
+
+warnings.filterwarnings("ignore")
+logging.basicConfig(level=logging.WARNING, format="%(asctime)s  %(levelname)s  %(message)s")
+log = logging.getLogger(__name__)
+
+#Ticker universe
+TICKER_UNIVERSE = {
+    "AAPL","MSFT","NVDA","GOOGL","GOOG","AMZN","META","TSLA","ORCL","CRM",
+    "ADBE","NOW","SNOW","PLTR","UBER","ABNB","AMD","INTC","AVGO","QCOM",
+    "MU","AMAT","LRCX","KLAC","TXN","MRVL","JPM","BAC","WFC","GS","MS",
+    "C","BLK","SCHW","AXP","V","MA","PYPL","SQ","JNJ","LLY","ABBV","MRK",
+    "PFE","UNH","CVS","TMO","ABT","BMY","WMT","COST","HD","TGT","MCD",
+    "SBUX","NKE","PG","KO","PEP","PM","BA","CAT","DE","GE","HON","LMT",
+    "RTX","XOM","CVX","COP","OXY","NFLX","DIS","SPOT","SNAP","PINS","RBLX",
+    "TTWO","RIVN","LCID","F","GM","ENPH","FSLR","SPY","QQQ","IWM","DIA",
+    "GLD","TLT","COIN","MSTR","HOOD","T","VZ","NEE","AMT","PLD",
+}
+
+# Short English words and acronyms that match the ticker regex but aren't tickers
+_SKIP = {
+    "A","I","AM","AN","AS","AT","BE","BY","DO","GO","IF","IN","IS","IT",
+    "ME","MY","NO","OF","ON","OR","SO","TO","UP","US","WE","AI","UK","EU",
+    "UN","DC","VS","THE","AND","FOR","ARE","BUT","NOT","YOU","ALL","CAN",
+    "HER","WAS","ONE","OUR","OUT","DAY","HAD","HIM","HIS","HOW","ITS","NEW",
+    "NOW","OLD","SEE","TWO","WHO","DID","GET","HAS","LET","PUT","SAY","SHE",
+    "TOO","USE","CEO","CFO","COO","IPO","ETF","GDP","FED","SEC","FDA","DOJ",
+    "FTC","DOW","OIL","GAS","USD","EUR","YEN","IMF","ECB","ESG","EPS","PE",
+    "EV","IV","PR","IR","HR","IT","VC","PE","RE","NY","LA","SF","DC","UK",
+}
+
+# Google News queries — one per sector/theme 
+# More queries = more articles. Each returns ~10-20 headlines.
+GOOGLE_NEWS_QUERIES = [
+    # Big tech
+    "Apple AAPL Microsoft MSFT Nvidia NVDA stock earnings",
+    "Google Alphabet GOOGL Amazon AMZN stock earnings",
+    "Meta Facebook META Tesla TSLA stock earnings",
+    "Oracle CRM Salesforce Adobe ADBE stock earnings",
+    # Semis
+    "AMD Intel semiconductor chip stock earnings",
+    "Broadcom AVGO Qualcomm QCOM semiconductor stock",
+    "Micron MU AMAT LRCX chip equipment stock",
+    # Finance
+    "JPMorgan Goldman Sachs Morgan Stanley bank earnings",
+    "Bank of America Wells Fargo Citigroup bank stock",
+    "Visa Mastercard PayPal SQ fintech stock earnings",
+    "BlackRock Schwab AXP financial stock earnings",
+    # Healthcare
+    "Eli Lilly LLY Pfizer PFE Merck MRK pharma stock",
+    "AbbVie ABBV Johnson Johnson JNJ biotech stock",
+    "UnitedHealth UNH CVS TMO healthcare stock earnings",
+    # Consumer
+    "Walmart WMT Amazon Target TGT retail earnings stock",
+    "McDonald's MCD Starbucks SBUX Nike NKE consumer stock",
+    "Coca-Cola KO PepsiCo PEP Procter Gamble PG stock",
+    # Industrials
+    "Boeing BA Lockheed LMT Raytheon RTX defense stock",
+    "Caterpillar CAT Deere DE GE Honeywell industrial stock",
+    # Energy
+    "Exxon XOM Chevron CVX ConocoPhillips COP oil energy stock",
+    "OXY Occidental energy oil gas stock earnings",
+    # Media / streaming
+    "Netflix NFLX Disney DIS streaming media stock earnings",
+    "Spotify SPOT Snap SNAP social media stock earnings",
+    # EV / clean energy
+    "Tesla Rivian RIVN GM Ford EV electric vehicle stock",
+    "Enphase ENPH solar clean energy stock earnings",
+    # Crypto-adjacent
+    "Coinbase COIN MicroStrategy MSTR Bitcoin crypto stock",
+    # Macro / broad market
+    "stock market earnings beat miss guidance outlook",
+    "S&P 500 Nasdaq Dow Jones rally selloff market",
+    "analyst upgrade downgrade price target buy sell rating",
+    "Federal Reserve interest rates inflation stock market",
+    "merger acquisition deal IPO stock market",
+    "short interest options volatility stock squeeze",
+]
+
+
+def _gn_url(query: str) -> str:
+    return (
+        f"https://news.google.com/rss/search"
+        f"?q={quote_plus(query)}&hl=en-US&gl=US&ceid=US:en"
+    )
+
+
+# HTTP helper 
+
+def _get(url: str, session: requests.Session, timeout: int = 12):
+    for attempt in range(3):
+        try:
+            r = session.get(url, timeout=timeout)
+            if r.status_code == 200:
+                return r
+        except Exception as e:
+            log.debug(f"Attempt {attempt+1} failed ({url}): {e}")
+        time.sleep(1.5 * (attempt + 1))
+    return None
+
+
+def _parse_rss(xml_text: str) -> List[Dict]:
+    items = []
+    try:
+        root = ET.fromstring(xml_text)
+        ns = {"atom": "http://www.w3.org/2005/Atom"}
+        for item in root.iter("item"):
+            title = (item.findtext("title") or "").strip()
+            link  = (item.findtext("link")  or "").strip()
+            if title:
+                items.append({"title": title, "link": link})
+        if not items:
+            for entry in root.findall(".//atom:entry", ns):
+                title   = (entry.findtext("atom:title", "", ns) or "").strip()
+                link_el = entry.find("atom:link", ns)
+                link    = (link_el.get("href", "") if link_el is not None else "").strip()
+                if title:
+                    items.append({"title": title, "link": link})
+    except ET.ParseError:
+        pass
+    return items
+
+
+# Ticker extraction 
+
+def extract_tickers(text: str) -> List[str]:
+    found = set()
+    for m in re.findall(r"\b([A-Z]{2,5})\b", text.upper()):
+        if m not in _SKIP and m in TICKER_UNIVERSE:
+            found.add(m)
+    return sorted(found)
+
+
+# Sentiment 
+
+def score_sentiment(text: str) -> Dict[str, float]:
+    if not text:
+        return {"polarity": 0.0, "subjectivity": 0.0}
+    b = TextBlob(text)
+    return {"polarity": b.sentiment.polarity,
+            "subjectivity": b.sentiment.subjectivity}
+
+
+# Scrapers 
+
+def scrape_google_news(session: requests.Session) -> List[Dict]:
+    """
+    Fire every query in GOOGLE_NEWS_QUERIES and collect all unique headlines.
+    This is the primary (and most reliable) source.
+    """
+    articles: List[Dict] = []
+    seen: set = set()
+
+    print(f"  Running {len(GOOGLE_NEWS_QUERIES)} Google News queries...")
+    for i, query in enumerate(GOOGLE_NEWS_QUERIES, 1):
+        r = _get(_gn_url(query), session)
+        if not r:
+            continue
+        batch = 0
+        for item in _parse_rss(r.text):
+            title = item["title"]
+            if title in seen:
+                continue
+            seen.add(title)
+            tickers = extract_tickers(title)
+            if tickers:
+                articles.append({"title": title, "url": item["link"],
+                                 "source": "google_news", "tickers": tickers})
+                batch += 1
+        print(f"    [{i:02d}/{len(GOOGLE_NEWS_QUERIES)}] {query[:55]:<55}  +{batch}")
+        time.sleep(0.35)   # polite delay
+
+    return articles
+
+
+def scrape_bonus_sources(session: requests.Session) -> List[Dict]:
+    """
+    Try Yahoo Finance, MarketWatch, Reuters, Reddit.
+    Each is attempted but silently skipped on failure — they block frequently.
+    """
+    articles: List[Dict] = []
+    seen: set = set()
+
+    bonus = [
+        ("Yahoo Finance",  ["https://finance.yahoo.com/news/rssindex"]),
+        ("MarketWatch",    ["https://feeds.marketwatch.com/marketwatch/topstories/",
+                            "https://feeds.marketwatch.com/marketwatch/realtimeheadlines/"]),
+        ("Reuters",        ["https://feeds.reuters.com/reuters/businessNews",
+                            "https://feeds.reuters.com/reuters/companyNews"]),
+        ("AP Business",    ["https://feeds.apnews.com/rss/apf-business"]),
+    ]
+
+    for name, feeds in bonus:
+        count = 0
+        for url in feeds:
+            r = _get(url, session, timeout=8)
+            if not r:
+                continue
+            for item in _parse_rss(r.text):
+                title = item["title"]
+                if title in seen:
+                    continue
+                seen.add(title)
+                tickers = extract_tickers(title)
+                if tickers:
+                    articles.append({"title": title, "url": item["link"],
+                                     "source": name.lower().replace(" ", "_"),
+                                     "tickers": tickers})
+                    count += 1
+            time.sleep(0.3)
+        if count:
+            print(f"  {name:<18} +{count}")
+
+    # Reddit
+    reddit_count = 0
+    for sub in ["stocks", "wallstreetbets", "investing", "stockmarket"]:
+        r = _get(f"https://www.reddit.com/r/{sub}/hot.json?limit=25", session, timeout=10)
+        if not r:
+            continue
+        try:
+            posts = r.json().get("data", {}).get("children", [])
+        except Exception:
+            continue
+        for post in posts:
+            d = post.get("data", {})
+            title = (d.get("title") or "").strip()
+            if not title or title in seen:
+                continue
+            seen.add(title)
+            tickers = extract_tickers(title)
+            if tickers:
+                articles.append({"title": title,
+                                  "url": f"https://www.reddit.com{d.get('permalink','')}",
+                                  "source": f"reddit_{sub}", "tickers": tickers})
+                reddit_count += 1
+        time.sleep(1.0)
+    if reddit_count:
+        print(f"  {'Reddit':<18} +{reddit_count}")
+
+    return articles
+
+
+# Main class 
+
+class StockNewsPredictor:
+
+    FEATURE_COLS = [
+        "avg_polarity", "std_polarity", "avg_subjectivity",
+        "article_count", "pct_positive", "pct_negative", "sentiment_edge",
+    ]
+
+    def __init__(self):
+        self.session = requests.Session()
+        self.session.headers.update({
+            "User-Agent": (
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/124.0.0.0 Safari/537.36"
+            ),
+            "Accept-Language": "en-US,en;q=0.9",
+        })
+        self.model  = None
+        self.scaler = StandardScaler()
+
+    #  Step 1 
+    def scrape(self) -> pd.DataFrame:
+        print("\nScraping Google News (primary)...")
+        primary = scrape_google_news(self.session)
+        print(f"  Google News total:    {len(primary)} articles")
+
+        print("\nTrying bonus sources...")
+        bonus = scrape_bonus_sources(self.session)
+        print(f"  Bonus sources total:  {len(bonus)} articles")
+
+        all_articles = primary + bonus
+        df = pd.DataFrame(all_articles)
+        if df.empty:
+            return df
+
+        df = df.drop_duplicates(subset="title").reset_index(drop=True)
+        print(f"\n  ✓ {len(df)} unique ticker-bearing headlines collected")
+        return df
+
+    # Step 2
+    def build_features(self, df: pd.DataFrame) -> pd.DataFrame:
+        rows = []
+        for _, row in df.iterrows():
+            s = score_sentiment(row["title"])
+            for ticker in row["tickers"]:
+                rows.append({
+                    "ticker":       ticker,
+                    "polarity":     s["polarity"],
+                    "subjectivity": s["subjectivity"],
+                })
+
+        raw = pd.DataFrame(rows)
+        if raw.empty:
+            return raw
+
+        agg = raw.groupby("ticker").agg(
+            avg_polarity     = ("polarity",     "mean"),
+            std_polarity     = ("polarity",     "std"),
+            avg_subjectivity = ("subjectivity", "mean"),
+            article_count    = ("polarity",     "count"),
+            pct_positive     = ("polarity",     lambda x: (x > 0.05).mean()),
+            pct_negative     = ("polarity",     lambda x: (x < -0.05).mean()),
+        ).reset_index()
+
+        agg["std_polarity"]   = agg["std_polarity"].fillna(0.0)
+        agg["sentiment_edge"] = agg["pct_positive"] - agg["pct_negative"]
+        return agg
+
+    # Step 3 
+    def get_labels(self, tickers: List[str], forward_days: int = 5) -> pd.DataFrame:
+        end   = datetime.now()
+        start = end - timedelta(days=90)
+
+        try:
+            raw = yf.download(
+                tickers,
+                start=start.strftime("%Y-%m-%d"),
+                end=end.strftime("%Y-%m-%d"),
+                auto_adjust=True,
+                progress=False,
+            )
+            closes = raw["Close"] if isinstance(raw.columns, pd.MultiIndex) else raw
+        except Exception as e:
+            log.error(f"Price download failed: {e}")
+            return pd.DataFrame()
+
+        rows = []
+        for ticker in tickers:
+            if ticker not in closes.columns:
+                continue
+            s = closes[ticker].dropna()
+            if len(s) < forward_days + 2:
+                continue
+            try:
+                ret = float((s.iloc[-1] / s.iloc[-(forward_days + 1)]) - 1)
+                rows.append({"ticker": ticker, "return": ret,
+                             "label": 1 if ret > 0 else 0})
+            except Exception:
+                continue
+
+        return pd.DataFrame(rows)
+
+    # Step 4
+    def train(self, features: pd.DataFrame, labels: pd.DataFrame) -> None:
+        merged = features.merge(labels[["ticker", "label"]], on="ticker", how="inner")
+        if len(merged) < 10:
+            print(f"  Only {len(merged)} labeled samples — need ≥10.")
+            return
+
+        X = merged[self.FEATURE_COLS].values
+        y = merged["label"].values
+
+        counts = np.bincount(y)
+        stratify = y if len(counts) == 2 and counts.min() >= 2 else None
+        X_tr, X_te, y_tr, y_te = train_test_split(
+            X, y, test_size=0.20, random_state=42, stratify=stratify)
+        X_tr = self.scaler.fit_transform(X_tr)
+        X_te  = self.scaler.transform(X_te)
+
+        rf = RandomForestClassifier(
+            n_estimators=200, max_depth=6, min_samples_leaf=2,
+            class_weight="balanced", random_state=42, n_jobs=-1)
+        rf.fit(X_tr, y_tr)
+        rf_acc = accuracy_score(y_te, rf.predict(X_te))
+
+        gb = GradientBoostingClassifier(
+            n_estimators=200, learning_rate=0.05, max_depth=4,
+            subsample=0.8, random_state=42)
+        gb.fit(X_tr, y_tr)
+        gb_acc = accuracy_score(y_te, gb.predict(X_te))
+
+        use_rf      = rf_acc >= gb_acc
+        self.model  = rf if use_rf else gb
+        best_name   = "Random Forest" if use_rf else "Gradient Boosting"
+        best_preds  = (rf if use_rf else gb).predict(X_te)
+
+        print(f"  Best: {best_name}  —  RF {rf_acc:.0%}  /  GB {gb_acc:.0%}")
+        print(classification_report(y_te, best_preds,
+                                    target_names=["DOWN", "UP"], zero_division=0))
+
+    # Step 5 
+    def predict(self, features: pd.DataFrame) -> pd.DataFrame:
+        if self.model is None:
+            raise RuntimeError("Call train() first.")
+
+        X     = self.scaler.transform(features[self.FEATURE_COLS].values)
+        preds = self.model.predict(X)
+        proba = self.model.predict_proba(X)
+
+        out = features[["ticker", "avg_polarity", "article_count",
+                         "pct_positive", "pct_negative", "sentiment_edge"]].copy()
+        out["signal"]     = ["▲ UP" if p == 1 else "▼ DOWN" for p in preds]
+        out["confidence"] = [max(p) for p in proba]
+        return out.sort_values("confidence", ascending=False).reset_index(drop=True)
+
+    # Save / load
+    def save(self, path: str = None) -> None:
+        if self.model is None:
+            print("  Nothing to save — model not trained.")
+            return
+        if path is None:
+            path = os.path.join(os.path.expanduser("~"), "stock_predictor.pkl")
+        joblib.dump({"model": self.model, "scaler": self.scaler}, path)
+        print(f"  Model saved → {path}")
+
+    def load(self, path: str = None) -> None:
+        if path is None:
+            path = os.path.join(os.path.expanduser("~"), "stock_predictor.pkl")
+        d = joblib.load(path)
+        self.model, self.scaler = d["model"], d["scaler"]
+        print(f"  Model loaded ← {path}")
+
+
+# Pretty output 
+
+def print_results(articles: pd.DataFrame, features: pd.DataFrame,
+                  labels: pd.DataFrame, predictions: pd.DataFrame) -> None:
+
+    total    = len(articles)
+    n_tickers = len(features)
+    n_labeled = len(labels)
+
+    print("\n" + "═"*64)
+    print("  NEWS SENTIMENT — STOCK DIRECTION PREDICTIONS")
+    print("═"*64)
+    print(f"  Headlines scraped : {total}")
+    print(f"  Tickers detected  : {n_tickers}")
+    print(f"  Tickers with price data : {n_labeled}")
+    print()
+
+    # Mention counts
+    counts = Counter(t for row in articles["tickers"] for t in row)
+    print(f"  {'TICKER':<8} {'MENTIONS':>8}  SENTIMENT BAR")
+    print("  " + "-"*42)
+    for ticker, n in counts.most_common(20):
+        row = features[features["ticker"] == ticker]
+        if row.empty:
+            continue
+        pol = float(row["avg_polarity"].iloc[0])
+        # ASCII bar: positive = ▓, negative = ░
+        bar_len = int(abs(pol) * 20)
+        bar = ("▓" * bar_len) if pol >= 0 else ("░" * bar_len)
+        sign = "+" if pol >= 0 else "-"
+        print(f"  {ticker:<8} {n:>8}   {sign}{bar}")
+
+    # Predictions table
+    print()
+    print(f"  {'TICKER':<7} {'SIGNAL':<8} {'CONF':>6}  {'POLARITY':>9}  "
+          f"{'%POS':>6}  {'%NEG':>6}  {'ARTICLES':>8}  RECENT RETURN")
+    print("  " + "-"*75)
+
+    merged = predictions.merge(labels[["ticker", "return"]], on="ticker", how="left")
+
+    for _, row in merged.iterrows():
+        ticker   = row["ticker"]
+        signal   = row["signal"]
+        conf     = row["confidence"]
+        pol      = row["avg_polarity"]
+        ppos     = row["pct_positive"]
+        pneg     = row["pct_negative"]
+        arts     = int(row["article_count"])
+        ret      = row.get("return", float("nan"))
+        ret_str  = f"{ret:+.1%}" if not pd.isna(ret) else "  n/a"
+
+        # Color-code signal with unicode
+        sig_icon = "▲" if "UP" in signal else "▼"
+        print(f"  {ticker:<7} {sig_icon} {'UP' if 'UP' in signal else 'DOWN':<6} "
+              f"{conf:>6.1%}  {pol:>+9.3f}  {ppos:>5.0%}   {pneg:>5.0%}  "
+              f"{arts:>8}   {ret_str}")
+
+    print()
+    print("  LEGEND")
+    print("  ▲ UP   = model predicts price higher in ~5 trading days")
+    print("  ▼ DOWN = model predicts price lower  in ~5 trading days")
+    print("  CONF   = model confidence (higher = stronger signal)")
+    print("  POLARITY = avg TextBlob sentiment score of headlines (-1 to +1)")
+    print("  %POS/%NEG = share of headlines clearly positive / negative")
+    print("  RECENT RETURN = actual 5-day return used to label the training data")
+    print("═"*64)
+
+
+# Entry point 
+
+if __name__ == "__main__":
+    p = StockNewsPredictor()
+
+    # 1. Scrape
+    articles = p.scrape()
+    if articles.empty:
+        print("\nNo articles scraped. Check internet connection.")
+        raise SystemExit(1)
+
+    # 2. Features
+    print("\nBuilding sentiment features...")
+    features = p.build_features(articles)
+
+    # 3. Labels
+    print("Fetching price data...")
+    labels = p.get_labels(features["ticker"].tolist(), forward_days=5)
+    if labels.empty:
+        print("No price data returned. Check yfinance / internet.")
+        raise SystemExit(1)
+
+    # 4. Train
+    print("Training classifiers...")
+    p.train(features, labels)
+
+    # 5. Predict + display
+    if p.model is not None:
+        predictions = p.predict(features)
+        print_results(articles, features, labels, predictions)
+        p.save()   # saves to ~/stock_predictor.pkl by default

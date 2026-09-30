@@ -1,0 +1,109 @@
+// main.cpp — Planet Thermal Evolution Simulator
+// Created by David Moriarty, 11/7/24
+// Models the thermal evolution of an icy moon (Europa-like) using
+// finite difference heat diffusion with radioactive decay heating,
+// phase transitions (ice → ocean), and effective conductivity switching.
+
+#include <iostream>
+#include <cmath>
+#include <fstream>
+using namespace std;
+
+int main(int argc, const char * argv[]) {
+    ofstream planet_project;
+    double t, q, v_shell, m_shell, e_in, e_out, f_in, f_out, A_bottom, A_top;
+    t = 0;
+
+    const double pi        = 3.14159;
+    const double e         = 2.17828;
+    const double density_shell = 920;       // kg/m^3 ice shell
+    const double density_core  = 3000;      // kg/m^3 rocky core
+    const double cp_ice    = 1600;          // J/(kg·K) ice
+    const double cp_core   = 800;           // J/(kg·K) rock
+    const double k         = 3;             // W/(m·K) ice thermal conductivity
+    const double R         = 1188300;       // m  total radius (Europa-like)
+    const double R_core    = 930000;        // m  core radius
+    const double L         = 330000;        // J/kg latent heat of fusion
+    const double k_eff     = 20 * k;        // W/(m·K) liquid ocean effective conductivity
+
+    double T[201], T_new[201], r[201];
+    int i;
+    double dr = R / 200.0;
+    // Stability criterion: dt << dr^2 / diffusivity
+    double dt = 0.01 * (dr * dr) / (k / (density_shell * cp_ice));
+    double Cp, k_out, k_in;
+
+    planet_project.open("planetproj.txt");
+
+    // Initialise uniform temperature field at 40 K
+    for (i = 0; i <= 200; i++) {
+        T[i]     = 40.0;
+        T_new[i] = 40.0;
+        r[i]     = i * dr;
+    }
+
+    // --- TIME INTEGRATION (explicit finite difference) ---
+    while (t < 1.42e17) {          // ~4.5 Gyr in seconds
+        t += dt;
+        T[0] = T[1];               // reflective inner boundary
+
+        double ocean_thick = 0.0;
+
+        for (i = 1; i < 200; i++) {
+            r[i]  = i * dr;
+            v_shell = (4.0/3.0)*pi*(pow(r[i]+dr/2.0, 3) - pow(r[i]-dr/2.0, 3));
+            k_out = k;
+            k_in  = k;
+
+            if (r[i] < R_core) {
+                // Rocky core: radiogenic heat source decaying exponentially
+                m_shell = density_core * v_shell;
+                q       = 3e-11 * pow(e, -t / 1.42e17);   // W/kg, halved over simulation
+                Cp      = cp_core;
+            } else {
+                // Ice shell / ocean
+                m_shell = density_shell * v_shell;
+                Cp      = cp_ice;
+                q       = 0.0;
+
+                if (T[i] >= 270 && T[i] <= 273) {
+                    // Phase transition zone: absorb latent heat
+                    Cp = cp_ice + L / 3.0;
+                } else if (T[i] > 273) {
+                    // Liquid water: much higher effective conductivity
+                    Cp          = 20 * cp_ice;
+                    k_out       = k_eff;
+                    ocean_thick = r[i] - R_core;
+                }
+            }
+
+            // Propagate effective conductivity from inner neighbour
+            if (r[i-1] > R_core && T[i-1] > 273) k_in = k_eff;
+
+            // Spherical shell heat fluxes
+            f_in  = k_in  * (T[i-1] - T[i]) / dr;
+            f_out = k_out * (T[i] - T[i+1]) / dr;
+            A_bottom = 4 * pi * pow(r[i] - dr/2.0, 2);
+            A_top    = 4 * pi * pow(r[i] + dr/2.0, 2);
+            e_in  = f_in  * A_bottom;
+            e_out = f_out * A_top;
+
+            // Explicit update
+            T_new[i] = T[i] + (dt / (m_shell * Cp)) * (e_in - e_out) + (dt * q) / Cp;
+        }
+
+        T_new[0]   = T_new[1];   // inner BC
+        T_new[200] = 40.0;       // surface fixed at 40 K (space)
+
+        for (i = 0; i <= 200; i++) T[i] = T_new[i];
+    }
+
+    // Output final radial temperature profile
+    for (i = 0; i < 201; i++) {
+        planet_project << T[i] << endl;
+        cout << T[i] << endl;
+    }
+
+    planet_project.close();
+    return 0;
+}
