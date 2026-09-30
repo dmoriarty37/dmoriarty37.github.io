@@ -137,19 +137,20 @@ body.ready .hero-photo img{animation-play-state:running}
 .hx{padding:0}
 .hx-pin{position:sticky;top:0;height:100svh;overflow:hidden;display:flex;flex-direction:column;justify-content:center}
 .hx-track{display:flex;gap:18px;padding:0 var(--gut);will-change:transform;align-items:stretch}
+.hx-track::after{content:"";flex:0 0 max(1px,calc(var(--gut) - 18px))}
 .hx-intro{flex:0 0 min(560px,80vw);display:flex;flex-direction:column;justify-content:center;padding-right:40px}
 .hx-intro p{color:var(--dim);font-size:16px;max-width:380px;margin-top:28px}
 .hx-hint{display:inline-flex;align-items:center;gap:10px;margin-top:26px;font-family:"Geist Mono",monospace;font-size:12px;color:var(--faint)}
 .hx-hint i{display:inline-block;width:40px;height:1px;background:var(--faint);position:relative;overflow:hidden}
 .hx-hint i::after{content:"";position:absolute;inset:0;background:var(--acc);animation:hint 1.8s var(--ease) infinite}
 @keyframes hint{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
-.job{flex:0 0 min(470px,84vw);background:var(--card);border:1px solid var(--line);border-radius:28px;padding:clamp(24px,2.6vw,36px);display:flex;flex-direction:column;min-height:min(560px,70svh);position:relative;overflow:hidden;transition:border-color .3s}
+.job{flex:0 0 min(540px,84vw);background:var(--card);border:1px solid var(--line);border-radius:28px;padding:clamp(24px,2.6vw,36px);display:flex;flex-direction:column;min-height:min(560px,70svh);position:relative;overflow:hidden;transition:border-color .3s}
 .job:hover{border-color:var(--line-2)}
 .job-n{font-family:"Geist Mono",monospace;font-size:12px;color:var(--faint);display:flex;justify-content:space-between}
 .job-org{font-size:clamp(28px,2.8vw,40px);font-weight:600;letter-spacing:-.045em;line-height:1.02;margin:auto 0 10px;padding-top:40px}
 .job-role{font-size:14px;color:var(--acc);margin-bottom:20px}
 .job ul{list-style:none;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);padding-top:20px}
-.job li{font-size:14.5px;color:#bebdb7;line-height:1.55;padding-left:18px;position:relative}
+.job li{font-size:14px;color:#bebdb7;line-height:1.55;padding-left:18px;position:relative}
 .job li::before{content:"↳";position:absolute;left:0;color:var(--acc);font-size:13px}
 .job-quote{font-family:"Instrument Serif",serif;font-style:italic;font-size:20px;line-height:1.3;color:var(--text);margin-top:18px;padding-left:14px;border-left:2px solid var(--acc)}
 .job-quote cite{display:block;font-family:"Geist Mono",monospace;font-style:normal;font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-top:8px}
@@ -435,9 +436,9 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
         <div class="job-org">Advantage Capital</div>
         <div class="job-role">Student Consultant, WashU Olin Practicum</div>
         <ul>
-          <li>Evaluating a new Clean Energy Finance business line built on battery storage for industrial hosts in Opportunity Zones</li>
-          <li>Sizing the market under conventional project finance vs. an OZ structure across cost of capital and PPA price</li>
-          <li>Building the host credit framework and the business plan going to firm leadership for a launch decision</li>
+          <li>Evaluating whether the firm should launch a Clean Energy Finance business line, assessing whether behind-the-meter battery storage projects for industrial hosts in Opportunity Zones clear return thresholds under an OZ-enhanced structure</li>
+          <li>Sizing the addressable market under conventional project finance against the OZ structure, modeling adoption against cost of capital and PPA price to quantify the incremental market the structure unlocks</li>
+          <li>Building the credit framework used to underwrite project hosts on offtake reliability and counterparty risk, and delivering a business plan to firm leadership with a return model, go-to-market plan, and investor summary</li>
         </ul>
         <span class="badge">Olin Practicum &middot; Clean energy finance</span>
       </article>
@@ -446,11 +447,11 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
         <div class="ghost-n">02</div>
         <div class="job-n"><span>Jun &mdash; Aug 2026</span><span>Huntsville</span></div>
         <div class="job-org">NASA Marshall Space Flight Center</div>
-        <div class="job-role">Business Analyst Intern, OCFO &middot; Budget Integration &amp; Analysis</div>
+        <div class="job-role">Business Analyst Intern, Office of the CFO</div>
         <ul>
-          <li>Tracked $5B+ in capital deployment against plan and built the center&apos;s FY26 investment tracking reporting</li>
-          <li>Selected to model ~$7B in obligations across ~200 Science Mission Directorate projects for agency-wide forecasting</li>
-          <li>Replaced a multi-week manual labor cost estimate with a mixed-integer program the budget team now reruns</li>
+          <li>Monitored $5B+ in capital deployment across the center&apos;s directorates against plan, building the FY26 investment tracking reporting and running FY24&ndash;FY26 variance analysis leadership used to redirect funding</li>
+          <li>Selected to model ~$7B in cost obligations and actuals across ~200 Science Mission Directorate projects at NASA headquarters, building the forecasting tool used for agency-wide financial planning</li>
+          <li>Optimized labor cost allocation across the center&apos;s operating budget with a mixed-integer linear program, replacing a multi-week manual estimate with a model the budget team now runs recurringly</li>
         </ul>
         <a class="badge" href="https://www.linkedin.com/posts/although-the-summer-internship-season-just-ugcPost-7493346829233885184-7fYV/" target="_blank" rel="noopener">&#9733; Featured in NASA&apos;s Marshall Star &nearr;</a>
       </article>
@@ -461,11 +462,11 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
         <div class="job-org">WashU Student Investment Fund</div>
         <div class="job-role">Senior Analyst</div>
         <ul>
-          <li>Pitched Cal-Maine Foods on its shift to specialty eggs, which grew from 30.4% to 39.8% of sales</li>
-          <li>Built the Arista Networks thesis around a 49% operating cash flow margin and $6.1B in contracted revenue</li>
-          <li>Structured diligence for both DCF models; both names cleared committee into the $250k+ portfolio</li>
+          <li>WUSIF is Washington University&apos;s student-managed investment fund, running a $250k+ equity portfolio where analysts research companies and pitch buy recommendations to an investment committee</li>
+          <li>As a Senior Analyst, I cover the industrials and consumer sectors, building DCF valuations and structuring the diligence behind each pitch before it goes to committee</li>
+          <li>Both names I built pitches for, Cal-Maine Foods and Arista Networks, cleared committee into the portfolio, and our team earned &ldquo;Best Valuation Model&rdquo; at the WUSIF Pitch Competition</li>
         </ul>
-        <span class="badge">&#9733; Best Valuation Model &middot; WUSIF Pitch Competition</span>
+        <a class="badge" href="#research">See the pitch decks &darr;</a>
       </article>
 
       <article class="job">
@@ -474,9 +475,9 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
         <div class="job-org">BioGenerator Ventures</div>
         <div class="job-role">Student Consultant</div>
         <ul>
-          <li>Part of a four-person WashU team that built the firm&apos;s first impact report across its 137-company portfolio</li>
-          <li>Measured jobs, patents, SBIR grants, partnerships, and real estate across the portfolio from public sources</li>
-          <li>Recommended standardized company reporting and a central dashboard to keep the impact baseline current</li>
+          <li>Analyzed the full 137-company portfolio of a seed-stage venture firm whose companies have raised $2.8B in follow-on capital against under $50M invested by the firm, over 50x per dollar</li>
+          <li>Built the firm&apos;s first portfolio-wide performance framework with a four-person WashU team, tracking financial, workforce, and research KPIs across the book from public sources</li>
+          <li>Delivered the analysis to industry partners and university stakeholders to support the firm&apos;s next fundraise, with recommendations for standardized reporting going forward</li>
         </ul>
         <a class="badge" href="#research">WashU Engineers in the Community &darr;</a>
       </article>
@@ -485,11 +486,11 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
         <div class="ghost-n">05</div>
         <div class="job-n"><span>2019 &mdash; 2025</span><span>Providence &middot; Boston</span></div>
         <div class="job-org">Off the desk</div>
-        <div class="job-role">Club hockey &middot; Moriarty &amp; Sons</div>
+        <div class="job-role">Providence College Club Hockey &middot; Moriarty &amp; Sons</div>
         <ul>
-          <li>Grew up playing competitive hockey across Maine and the Boston area, on a team my whole life</li>
-          <li>Played two seasons on Providence College&apos;s ACHA club hockey team while studying engineering</li>
-          <li>Spent five summers as a utility contractor replacing residential lead water service lines with copper</li>
+          <li>Played competitive hockey most of my life growing up in Maine and the Boston area, then two seasons on Providence College&apos;s ACHA club team</li>
+          <li>Spent five summers as a utility contractor at Moriarty &amp; Sons, replacing residential water service lines from lead to copper</li>
+          <li>Upgraded stormwater infrastructure across those five summers, meeting municipal safety and regulatory requirements on every job</li>
         </ul>
         <span class="badge">ACHA club hockey &middot; Five summers in the field</span>
       </article>
@@ -889,6 +890,7 @@ function onScroll() {
 addEventListener('scroll', onScroll, {passive: true});
 addEventListener('resize', () => { sizeHx(); onScroll(); });
 addEventListener('load', () => { sizeHx(); onScroll(); });
+if ('ResizeObserver' in window) new ResizeObserver(() => { sizeHx(); onScroll(); }).observe(track);
 sizeHx();
 
 /* ---------------- cursor + magnetic ---------------- */
