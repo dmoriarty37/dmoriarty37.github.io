@@ -176,9 +176,9 @@ body.ready .hero-photo img{animation-play-state:running}
 .panel-head p{color:var(--dim);font-size:14.5px;max-width:520px;margin-top:8px}
 .panel .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
 .p-pluto{grid-column:span 12}
-.p-game{grid-column:span 7}
-.p-nb{grid-column:span 5}
-@media(max-width:1000px){.p-game,.p-nb{grid-column:span 12}}
+.p-game{grid-column:span 12;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);align-items:start}
+.p-game .panel-head{padding-bottom:28px}
+@media(max-width:900px){.p-game{grid-template-columns:1fr}.p-game .panel-head{padding-bottom:0}}
 
 .pluto{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px;padding:20px 28px 28px;align-items:center}
 .pluto-canvas-wrap{position:relative;aspect-ratio:1;max-width:560px;width:100%;margin:0 auto}
@@ -237,15 +237,6 @@ body.ready .hero-photo img{animation-play-state:running}
 .pad button:active{background:var(--acc);color:var(--ink)}
 @media(pointer:coarse){.pad{display:grid}}
 
-.nb-frame{display:block;margin:20px 28px 0;border-radius:18px 18px 0 0;overflow:hidden;border:1px solid var(--line-2);border-bottom:0;height:340px;position:relative;background:#F2F0ED}
-.nb-frame iframe{width:1280px;height:800px;border:0;transform:scale(.42);transform-origin:0 0;pointer-events:none}
-.nb-frame .launch{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;padding:22px;background:linear-gradient(0deg,rgba(10,10,11,.85),rgba(10,10,11,0) 55%);transition:background .3s}
-.nb-frame:hover .launch{background:linear-gradient(0deg,rgba(10,10,11,.9),rgba(10,10,11,.2) 70%)}
-.nb-body{padding:22px 28px 28px;border-top:1px solid var(--line)}
-.nb-body ul{list-style:none;display:flex;flex-direction:column;gap:8px}
-.nb-body li{font-size:14px;color:#bebdb7;padding-left:18px;position:relative}
-.nb-body li::before{content:"↳";position:absolute;left:0;color:var(--acc)}
-.nb-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
 
 /* ---------- decks ---------- */
 .research{display:grid;grid-template-columns:1.1fr 1fr;gap:14px;margin-bottom:clamp(56px,7vw,96px)}
@@ -261,6 +252,9 @@ body.ready .hero-photo img{animation-play-state:running}
 .bstat .l{font-size:13px;color:var(--dim)}
 .bstat.hl{background:var(--acc);color:var(--ink);border-color:var(--acc)}
 .bstat.hl .l{color:rgba(10,10,11,.7)}
+.bstat.src{background:transparent;border-style:dashed;justify-content:flex-end}
+.bstat.src .l{font-size:12.5px;line-height:1.55}
+.research{margin:clamp(56px,7vw,96px) 0 0}
 @media(max-width:900px){.research{grid-template-columns:1fr}.rs-main ul{grid-template-columns:1fr}}
 
 .deck{border-top:1px solid var(--line);padding:clamp(28px,4vw,48px) 0}
@@ -382,9 +376,8 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
 <nav class="nav" aria-label="Main">
   <a href="#top" class="nav-logo" aria-label="Home">DM</a>
   <a href="#experience" class="lnk hs">Experience</a>
-  <a href="#lab" class="lnk">Lab</a>
-  <a href="#decks" class="lnk">Decks</a>
-  <a href="#code" class="lnk hs">Code</a>
+  <a href="#research" class="lnk">Research</a>
+  <a href="#archive" class="lnk hs">Archive</a>
   <a href="#about" class="lnk hs">About</a>
   <a href="#contact" class="cta">Contact</a>
 </nav>
@@ -400,9 +393,9 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
       <div class="l2"><span class="w"><span>Moriarty</span></span><span class="w"><span>.</span></span></div>
     </h1>
     <div class="hero-row">
-      <p class="hero-lede">Financial engineering &amp; data science at WashU. Ex-NASA OCFO. I build <span class="rotator" id="rotator"><span class="on">valuation models</span><span>data pipelines</span><span>simulations</span><span>forecasts</span></span><br>that turn messy data into decisions.</p>
+      <p class="hero-lede">Financial engineering &amp; data science at WashU. Ex-NASA OCFO. I build <span class="rotator" id="rotator"><span class="on">valuation models</span><span>forecasting tools</span><span>optimization models</span><span>dashboards</span></span><br>that turn messy data into decisions.</p>
       <div class="hero-btns">
-        <a href="#lab" class="btn fill mag">Enter the Lab &darr;</a>
+        <a href="#experience" class="btn fill mag">See my work &darr;</a>
         <a href="#contact" class="btn ghost mag">Get in touch</a>
       </div>
     </div>
@@ -478,8 +471,8 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
         <div class="job-org">BioGenerator Ventures</div>
         <div class="job-role">Student Consultant</div>
         <ul>
-          <li>Analyzed the full 137-company portfolio: $2.8B in follow-on capital against under $50M deployed, over 50x per dollar invested</li>
-          <li>Built the firm&apos;s first portfolio-wide performance framework tracking financial, workforce, and research KPIs</li>
+          <li>Part of a four-person WashU team that built the firm&apos;s first impact report across its 137-company portfolio</li>
+          <li>Tracked jobs, patents, SBIR grants, partnerships, and real estate from public sources, and recommended a standardized reporting framework (<a href="#research" style="color:var(--acc)">more below</a>)</li>
         </ul>
       </article>
 
@@ -498,15 +491,52 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
   </div>
 </section>
 
-<!-- ================= LAB ================= -->
-<section id="lab" style="background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+
+
+<!-- ================= RESEARCH ================= -->
+<section id="research">
   <div class="wrap">
     <div class="sec-head">
       <div>
-        <div class="eyebrow">02 &mdash; <b>The Lab</b></div>
-        <h2 class="h2 split">Don&apos;t take my word. <span class="serif">Run it.</span></h2>
+        <div class="eyebrow">02 &mdash; <b>Research</b></div>
+        <h2 class="h2 split">Equity research, <span class="serif">slide by slide.</span></h2>
       </div>
-      <p class="rv">Working proof of concept, live in your browser: real simulation output, a playable port of my C++ game, and the demo I pitched to New Balance.</p>
+      <p class="rv">Buy pitches I built at the WashU Student Investment Fund, plus an impact study for a St. Louis venture investor. Drag to browse, click any slide to go full screen.</p>
+    </div>
+
+    <div id="deckList"></div>
+
+    <div class="research">
+      <div class="rs-main rv">
+        <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag a">BioGenerator Ventures</span><span class="tag">Fall 2025</span><span class="tag">Team of 4</span></div>
+        <h3>The first impact report for a St. Louis biotech investor.</h3>
+        <p>BioGenerator is the startup arm of BioSTL, backing early-stage companies in human health and agtech. Its effect on the region had never been measured. Through WashU&apos;s Engineers in the Community program, our four-person team built the first baseline, researching the portfolio company by company across public sources like PitchBook, LinkedIn, USPTO, ClinicalTrials.gov, and SBIR records.</p>
+        <ul>
+          <li>Tracked five impact areas: jobs, innovation, partnerships, talent, and real estate</li>
+          <li>Built portfolio status and survival views by investment cohort</li>
+          <li>Mapped portfolio companies across the St. Louis region</li>
+          <li>Recommended standardized company reporting and a central dashboard</li>
+        </ul>
+      </div>
+      <div class="rs-stats">
+        <div class="bstat hl rv"><div class="v">137</div><div class="l">companies started</div></div>
+        <div class="bstat rv d1"><div class="v">~$50M</div><div class="l">invested by BioGenerator</div></div>
+        <div class="bstat rv d2"><div class="v">$2.8B+</div><div class="l">raised by portfolio companies</div></div>
+        <div class="bstat rv d3 src"><div class="l">Figures are BioGenerator&apos;s own, from its October 2025 overview. Our team&apos;s job was measuring what that capital did for St. Louis.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ARCHIVE ================= -->
+<section id="archive" style="background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">03 &mdash; <b>Archive</b></div>
+        <h2 class="h2 split">Where I <span class="serif">started.</span></h2>
+      </div>
+      <p class="rv">Two of the first things I built when I was learning to code, rebuilt so you can run them in your browser. Not my day-to-day work anymore, but I still like them.</p>
     </div>
 
     <div class="lab-grid">
@@ -576,80 +606,25 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
         </div>
       </div>
 
-      <!-- NB -->
-      <div class="panel p-nb rv d1">
-        <div class="panel-head">
-          <div>
-            <div class="tags"><span class="tag a">Hackathon</span><span class="tag">New Balance &times; WashU &middot; Mar 2026</span></div>
-            <h3>NB Style Agent</h3>
-            <p>A conversational style advisor I pitched to New Balance as strategy lead and presenter.</p>
-          </div>
-        </div>
-        <a class="nb-frame" href="nb-style-agent/" target="_blank" rel="noopener" data-cursor="Open">
-          <iframe data-src="nb-style-agent/" title="NB Style Agent demo preview" tabindex="-1" loading="lazy"></iframe>
-          <span class="launch"><span class="btn fill sm">Launch live demo &nearr;</span></span>
-        </a>
-        <div class="nb-body">
-          <ul>
-            <li>Parses free-text style, occasion, and budget into scores across a 20-model catalog</li>
-            <li>Python prototype scores a 30-shoe catalog and remembers returning users</li>
-            <li>Business case built on cart abandonment and AI-assisted conversion lift</li>
-          </ul>
-          <div class="nb-links"><button class="btn ghost sm" data-code="nbagent" data-file="nb_style_agent.py">Python source</button></div>
-        </div>
-      </div>
     </div>
   </div>
 </section>
 
-<!-- ================= DECKS ================= -->
-<section id="decks">
+<!-- ================= COURSEWORK + CODE ================= -->
+<section id="code">
   <div class="wrap">
     <div class="sec-head">
       <div>
-        <div class="eyebrow">03 &mdash; <b>Research &amp; decks</b></div>
-        <h2 class="h2 split">The receipts. <span class="serif">Slide by slide.</span></h2>
+        <div class="eyebrow">04 &mdash; <b>Coursework &amp; code</b></div>
+        <h2 class="h2 split">Class projects &amp; <span class="serif">side builds.</span></h2>
       </div>
-      <p class="rv">The actual decks behind the pitches and studies. Drag to browse, click any slide to go full screen.</p>
+      <p class="rv">Statistics projects from class and Python I wrote along the way. Click any code panel to read the source.</p>
     </div>
-
-    <div class="research" id="research">
-      <div class="rs-main rv">
-        <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag a">BioGenerator Ventures</span><span class="tag">2010&ndash;2025 Q3</span></div>
-        <h3>A portfolio impact study for a St. Louis life sciences investor.</h3>
-        <p>Built BioGenerator Ventures&apos; first portfolio-wide performance framework across all 137 companies, which have raised $2.8B in follow-on capital on under $50M of BioGenerator capital. Merged private financials with USPTO patents, LinkedIn employment data, and SEC filings; delivered to industry partners and WashU stakeholders as the anchor figure for the firm&apos;s next fundraise.</p>
-        <ul>
-          <li>$75M+ non-dilutive SBIR funding (3.4x vs. VC capital)</li>
-          <li>Survival rate: 84% post-2015 vs. 68% pre-2015</li>
-          <li>15 companies (11%) scaled to 20+ employees vs. 5% industry avg.</li>
-          <li>64% of senior hires from Bay Area, San Diego &amp; Boston hubs</li>
-        </ul>
-      </div>
-      <div class="rs-stats">
-        <div class="bstat hl rv"><div class="v">50x+</div><div class="l">external capital per BioGenerator dollar</div></div>
-        <div class="bstat rv d1"><div class="v"><span data-count="1732">0</span></div><div class="l">STEM jobs supported</div></div>
-        <div class="bstat rv d2"><div class="v"><span data-count="467">0</span>+</div><div class="l">patents granted</div></div>
-        <div class="bstat rv d3"><div class="v"><span data-count="44">0</span></div><div class="l">WashU-founded companies</div></div>
-      </div>
-    </div>
-
-    <div id="deckList"></div>
-  </div>
-</section>
-
-<!-- ================= CODE STACK ================= -->
-<section id="code" style="background:var(--bg-2);border-top:1px solid var(--line)">
-  <div class="wrap">
-    <div class="sec-head">
-      <div>
-        <div class="eyebrow">04 &mdash; <b>Code</b></div>
-        <h2 class="h2 split">Things I&apos;ve <span class="serif">built.</span></h2>
-      </div>
-      <p class="rv">Quant research, ML, and data engineering. Click any code panel to read the full source.</p>
-    </div>
+    <div id="classDecks" style="margin-bottom:clamp(56px,7vw,96px)"></div>
     <div class="stack-list" id="stackList"></div>
   </div>
 </section>
+
 
 <!-- ================= ABOUT ================= -->
 <section id="about">
@@ -743,11 +718,11 @@ const DECKS = [
   {id:'onon', kind:'NYSE: ONON · WUSIF · Consumer Discretionary', title:'On Holding', stat:'+43%', statK:'upside · $43.40 → $63.08',
    desc:'Premium Swiss performance brand: <b>60.6% gross margins</b>, 29% YoY revenue growth, and a fast-growing DTC channel. 10-year DCF in CHF at a 6.14% WACC.',
    slides:[1,2,4,8,11,12,13,26]},
-  {id:'nba', kind:'SDS 4130 · Linear Statistical Models · Spring 2026', title:'Predicting NBA Draft Success', stat:'1,024', statK:'models searched',
-   desc:'Can pre-draft combine measurables and college stats predict early NBA production (WS/36) for ~132 college-route picks from 2022–2024? Full diagnostics, Box-Cox, WLS, and exhaustive selection. <b>Rebounds per 36 was the single strongest predictor</b>; final AIC/Cp model adj. R² = 0.27.',
+  {id:'nba', group:'class', kind:'SDS 4130 · Linear Statistical Models · Spring 2026', title:'Predicting NBA Draft Success', course:'Class project',
+   desc:'Can pre-draft combine measurables and college stats predict how a player performs in his first two NBA seasons? A regression study of 2022–2024 college-route draft picks, with full diagnostics, transformations, and model selection. The honest answer: only a little. <b>Rebounding rate carried most of the signal.</b>',
    slides:[1,2,4,5,6,15,16,22]},
-  {id:'ozone', kind:'SDS 4030 · Statistics for Data Science II · with Aaryabrat Chhatkuli', title:'What Drives Peak Ozone?', stat:'76.6%', statK:'variance explained (R²)',
-   desc:'112 summer days in southern France. Multiple regression plus HC3 robust errors, IRLS, jackknife and bootstrap, <b>10,000-permutation tests</b>, Box-Cox, ridge and lasso. Yesterday&apos;s ozone and morning cloud cover were the robust drivers.',
+  {id:'ozone', group:'class', kind:'SDS 4030 · Statistics for Data Science II · with Aaryabrat Chhatkuli', title:'What Drives Peak Ozone?', course:'Class project',
+   desc:'Which weather conditions drive daily peak ozone? A two-person final project working through regression, robust and resampling-based inference, and regularization on 112 summer days in southern France. <b>Yesterday&apos;s ozone and morning cloud cover</b> were the only predictors that held up.',
    slides:[1,2,3,4,8,9,12,17]},
 ];
 const PROJECTS = [
@@ -810,17 +785,19 @@ $$('.split').forEach(el => {
 $$('#heroName .w>span').forEach((s, i) => s.style.transitionDelay = (i * 0.12) + 's');
 
 /* ---------------- build decks ---------------- */
-$('#deckList').innerHTML = DECKS.map(d => `
+const deckHTML = d => `
   <div class="deck">
     <div class="deck-head">
       <div class="rv"><div class="deck-kind">${d.kind}</div><div class="deck-title">${d.title}</div></div>
       <p class="deck-desc rv d1">${d.desc}</p>
-      <div class="deck-stat rv d2"><div class="v">${d.stat}</div><div class="k">${d.statK}</div></div>
+      ${d.stat ? `<div class="deck-stat rv d2"><div class="v">${d.stat}</div><div class="k">${d.statK}</div></div>` : `<div class="deck-stat rv d2"><span class="tag">${d.course}</span></div>`}
     </div>
     <div class="strip" data-deck="${d.id}">
       ${d.slides.map((n, i) => `<button class="slide" data-deck="${d.id}" data-i="${i}" aria-label="${d.title} slide ${n}"><img src="assets/decks/${d.id}-${String(n).padStart(2,'0')}-sm.webp" alt="" loading="lazy" width="560" height="315"><span class="sn">${String(n).padStart(2,'0')}</span></button>`).join('')}
     </div>
-  </div>`).join('');
+  </div>`;
+$('#deckList').innerHTML = DECKS.filter(d => d.group !== 'class').map(deckHTML).join('');
+$('#classDecks').innerHTML = DECKS.filter(d => d.group === 'class').map(deckHTML).join('');
 
 /* ---------------- build code stack ---------------- */
 const hl = line => esc(line)
@@ -966,8 +943,6 @@ addEventListener('keydown', e => {
   if (lb.classList.contains('show')) { if (e.key === 'ArrowRight') lbStep(1); if (e.key === 'ArrowLeft') lbStep(-1); }
 });
 
-/* ---------------- NB iframe (lazy) ---------------- */
-new IntersectionObserver((es, o) => es.forEach(e => { if (e.isIntersecting && innerWidth > 700) { const f = $('.nb-frame iframe'); f.src = f.dataset.src; o.disconnect(); } }), {rootMargin: '200px'}).observe($('.nb-frame'));
 
 /* ---------------- Pluto simulation ---------------- */
 (function(){
