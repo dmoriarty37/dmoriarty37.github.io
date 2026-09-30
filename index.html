@@ -154,6 +154,7 @@ body.ready .hero-photo img{animation-play-state:running}
 .job-quote{font-family:"Instrument Serif",serif;font-style:italic;font-size:20px;line-height:1.3;color:var(--text);margin-top:18px;padding-left:14px;border-left:2px solid var(--acc)}
 .job-quote cite{display:block;font-family:"Geist Mono",monospace;font-style:normal;font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-top:8px}
 .job a.badge:hover{background:var(--acc);color:var(--ink)}
+.job ul{flex:1}
 .job .badge{transition:background .25s,color .25s;display:inline-flex;gap:8px;align-items:center;margin-top:18px;font-size:12.5px;font-weight:500;color:var(--acc);border:1px solid rgba(212,255,58,.3);background:rgba(212,255,58,.06);padding:7px 13px;border-radius:100px;align-self:flex-start}
 .job .ghost-n{position:absolute;right:-8px;top:-30px;font-size:200px;font-weight:800;letter-spacing:-.08em;color:rgba(255,255,255,.025);line-height:1;pointer-events:none}
 .job.hl{background:linear-gradient(160deg,#1c1f10,var(--card) 60%)}
@@ -434,10 +435,11 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
         <div class="job-org">Advantage Capital</div>
         <div class="job-role">Student Consultant, WashU Olin Practicum</div>
         <ul>
-          <li>Evaluating whether the firm should launch a Clean Energy Finance line: behind-the-meter battery storage for industrial hosts in Opportunity Zones</li>
-          <li>Sizing the market under conventional project finance vs. the OZ structure, modeling adoption against cost of capital and PPA price</li>
-          <li>Building the credit framework to underwrite hosts on offtake reliability and counterparty risk, plus a business plan for firm leadership</li>
+          <li>Evaluating a new Clean Energy Finance business line built on battery storage for industrial hosts in Opportunity Zones</li>
+          <li>Sizing the market under conventional project finance vs. an OZ structure across cost of capital and PPA price</li>
+          <li>Building the host credit framework and the business plan going to firm leadership for a launch decision</li>
         </ul>
+        <span class="badge">Olin Practicum &middot; Clean energy finance</span>
       </article>
 
       <article class="job">
@@ -446,12 +448,11 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
         <div class="job-org">NASA Marshall Space Flight Center</div>
         <div class="job-role">Business Analyst Intern, OCFO &middot; Budget Integration &amp; Analysis</div>
         <ul>
-          <li>Monitored $5B+ in capital deployment against plan and built the center&apos;s FY26 investment tracking reporting</li>
-          <li>Selected to model ~$7B in obligations across ~200 Science Mission Directorate projects at HQ, building the agency-wide forecasting tool</li>
-          <li>Replaced a multi-week manual labor cost estimate with a mixed-integer linear program the budget team now runs recurringly</li>
-                  </ul>
-        <blockquote class="job-quote">&ldquo;Builds Power BI dashboards, develops Python optimization tools&hellip;&rdquo;<cite>The Marshall Star &middot; Workforce Spotlight, Aug 2026</cite></blockquote>
-        <a class="badge" href="https://www.linkedin.com/posts/although-the-summer-internship-season-just-ugcPost-7493346829233885184-7fYV/" target="_blank" rel="noopener">&#9733; Featured in NASA&apos;s Marshall Star &middot; see the post &nearr;</a>
+          <li>Tracked $5B+ in capital deployment against plan and built the center&apos;s FY26 investment tracking reporting</li>
+          <li>Selected to model ~$7B in obligations across ~200 Science Mission Directorate projects for agency-wide forecasting</li>
+          <li>Replaced a multi-week manual labor cost estimate with a mixed-integer program the budget team now reruns</li>
+        </ul>
+        <a class="badge" href="https://www.linkedin.com/posts/although-the-summer-internship-season-just-ugcPost-7493346829233885184-7fYV/" target="_blank" rel="noopener">&#9733; Featured in NASA&apos;s Marshall Star &nearr;</a>
       </article>
 
       <article class="job">
@@ -460,11 +461,11 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
         <div class="job-org">WashU Student Investment Fund</div>
         <div class="job-role">Senior Analyst</div>
         <ul>
-          <li>Pitched a buy on Cal-Maine Foods (CALM): specialty rose from 30.4% to 39.8% of sales, FY23&ndash;FY24</li>
-          <li>Built the Arista Networks (ANET) thesis: 49% operating cash flow margin and $6.1B in contracted forward revenue</li>
-          <li>Structured diligence for both DCFs; both cleared committee into the $250k+ portfolio</li>
+          <li>Pitched Cal-Maine Foods on its shift to specialty eggs, which grew from 30.4% to 39.8% of sales</li>
+          <li>Built the Arista Networks thesis around a 49% operating cash flow margin and $6.1B in contracted revenue</li>
+          <li>Structured diligence for both DCF models; both names cleared committee into the $250k+ portfolio</li>
         </ul>
-        <span class="badge">&#9733; &ldquo;Best Valuation Model&rdquo; &middot; WUSIF Pitch Competition</span>
+        <span class="badge">&#9733; Best Valuation Model &middot; WUSIF Pitch Competition</span>
       </article>
 
       <article class="job">
@@ -474,8 +475,10 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
         <div class="job-role">Student Consultant</div>
         <ul>
           <li>Part of a four-person WashU team that built the firm&apos;s first impact report across its 137-company portfolio</li>
-          <li>Tracked jobs, patents, SBIR grants, partnerships, and real estate from public sources, and recommended a standardized reporting framework (<a href="#research" style="color:var(--acc)">more below</a>)</li>
+          <li>Measured jobs, patents, SBIR grants, partnerships, and real estate across the portfolio from public sources</li>
+          <li>Recommended standardized company reporting and a central dashboard to keep the impact baseline current</li>
         </ul>
+        <a class="badge" href="#research">WashU Engineers in the Community &darr;</a>
       </article>
 
       <article class="job">
@@ -484,9 +487,11 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
         <div class="job-org">Off the desk</div>
         <div class="job-role">Club hockey &middot; Moriarty &amp; Sons</div>
         <ul>
-          <li>Played two seasons on Providence College&apos;s ACHA club hockey team</li>
-          <li>Five summers as a utility contractor replacing residential lead water service lines with copper and upgrading stormwater infrastructure</li>
+          <li>Grew up playing competitive hockey across Maine and the Boston area, on a team my whole life</li>
+          <li>Played two seasons on Providence College&apos;s ACHA club hockey team while studying engineering</li>
+          <li>Spent five summers as a utility contractor replacing residential lead water service lines with copper</li>
         </ul>
+        <span class="badge">ACHA club hockey &middot; Five summers in the field</span>
       </article>
     </div>
     <div class="hx-bar"><i id="hxBar"></i></div>
@@ -862,10 +867,12 @@ addEventListener('scroll', lightWords, {passive: true}); lightWords();
 /* ---------------- scroll: progress, nav, horizontal ---------------- */
 const hx = $('#experience'), track = $('#hxTrack'), hxBar = $('#hxBar');
 const hxOn = () => !reduced && innerWidth > 900;
+// 2.4px of vertical scroll per 1px sideways, with a pause at each end
+const HX_SLOW = 2.4, HX_HOLD = 0.35;
 function sizeHx() {
   if (!hxOn()) { hx.style.height = ''; track.style.transform = ''; return; }
   const dist = track.scrollWidth - innerWidth;
-  hx.style.height = (innerHeight + dist) + 'px';
+  hx.style.height = (innerHeight + dist * HX_SLOW + innerHeight * HX_HOLD * 2) + 'px';
 }
 function onScroll() {
   const h = document.documentElement;
@@ -874,7 +881,8 @@ function onScroll() {
   $$('.nav a.lnk').forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + cur));
   if (hxOn()) {
     const r = hx.getBoundingClientRect(), dist = track.scrollWidth - innerWidth;
-    const p = Math.min(Math.max(-r.top / (hx.offsetHeight - innerHeight), 0), 1);
+    const hold = innerHeight * HX_HOLD, run = dist * HX_SLOW;
+    const p = Math.min(Math.max((-r.top - hold) / run, 0), 1);
     track.style.transform = `translate3d(${-p * dist}px,0,0)`; hxBar.style.transform = `scaleX(${p})`;
   }
 }
