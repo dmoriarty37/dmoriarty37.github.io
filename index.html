@@ -330,13 +330,31 @@ body.ready .hero-photo img{animation-play-state:running}
 .sk-list{display:flex;flex-wrap:wrap;gap:8px}
 .sk-list span{font-size:13.5px;padding:8px 14px;border-radius:100px;background:var(--card);border:1px solid var(--line);color:#d6d5cf;transition:background .25s,color .25s,border-color .25s}
 .sk-list span:hover{background:var(--acc);color:var(--ink);border-color:var(--acc)}
-.sports{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.sport{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;position:relative;overflow:hidden}
-.sport::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c)}
-.sport b{display:block;font-size:13px;font-weight:600}
-.sport span{display:block;font-family:"Geist Mono",monospace;font-size:11px;color:var(--dim);margin-top:4px;min-height:1.3em}
-.sport span.live{color:var(--dn)}
-@media(max-width:900px){.about{grid-template-columns:1fr}.about-photo{max-width:420px}.sports{grid-template-columns:1fr 1fr}}
+.sports{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sb{--c:#888;display:flex;flex-direction:column;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;position:relative;overflow:hidden;isolation:isolate;transition:transform .4s var(--ease),border-color .3s}
+.sb::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 0% 0%,color-mix(in srgb,var(--c) 28%,transparent),transparent 60%);z-index:-1;opacity:.9}
+.sb:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--c) 60%,transparent)}
+.sb-top{display:flex;align-items:center;gap:10px}
+.sb-top img{width:34px;height:34px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,.4))}
+.sb-top b{display:block;font-size:14px;font-weight:600;letter-spacing:-.01em;line-height:1.2}
+.sb-top small{display:block;font-family:"Geist Mono",monospace;font-size:10.5px;color:var(--dim);margin-top:2px}
+.sb-match{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:14px;padding:12px 10px}
+.sb-team{display:flex;flex-direction:column;align-items:center;gap:4px;font-family:"Geist Mono",monospace;font-size:11px;color:var(--dim)}
+.sb-team img{width:30px;height:30px;object-fit:contain}
+.sb-team.bos{color:var(--text)}
+.sb-mid{text-align:center;min-width:64px}
+.sb-score{font-size:24px;font-weight:700;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+.sb-score .w{color:var(--up)}.sb-score .l{color:var(--dn)}
+.sb-state{font-family:"Geist Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);margin-top:5px;white-space:nowrap}
+.sb-state.live{color:var(--dn);display:inline-flex;align-items:center;gap:5px}
+.sb-state.live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--dn);animation:ping 1.6s infinite}
+.sb-vs{font-family:"Geist Mono",monospace;font-size:11px;color:var(--faint)}
+.sb-when{font-size:13px;font-weight:600;line-height:1.25}
+.sb-foot{display:flex;justify-content:space-between;gap:8px;font-family:"Geist Mono",monospace;font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.06em}
+.sb-foot span:last-child{color:var(--dim)}
+.sb.skel .sb-match{min-height:78px}
+@media(max-width:520px){.sports{grid-template-columns:1fr}}
+@media(max-width:900px){.about{grid-template-columns:1fr}.about-photo{max-width:420px}}
 
 /* ---------- contact ---------- */
 .contact{padding-bottom:40px;overflow:hidden}
@@ -656,13 +674,12 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
           <div class="sk-group rv"><h4>Finance</h4><div class="sk-list"><span>Financial Modeling</span><span>DCF Valuation</span><span>Comparable Analysis</span><span>Variance Analysis</span><span>Forecasting</span><span>Due Diligence</span><span>Project Finance</span><span>Equity Research</span></div></div>
           <div class="sk-group rv"><h4>Quant &amp; ML</h4><div class="sk-list"><span>Machine Learning</span><span>Mixed-Integer Optimization</span><span>Regression &amp; Inference</span><span>Backtesting</span><span>Portfolio Optimization</span><span>Options Pricing</span><span>NLP</span><span>PyTorch</span><span>scikit-learn</span></div></div>
           <div class="sk-group rv"><h4>Languages &amp; tools</h4><div class="sk-list"><span>Python</span><span>SQL</span><span>R</span><span>C++</span><span>Java</span><span>Excel / VBA</span><span>Bloomberg</span><span>Power BI</span><span>Snowflake</span><span>SAP</span><span>Git</span></div></div>
-          <div class="sk-group rv"><h4>Next up for Boston</h4>
-            <div class="sports">
-              <div class="sport" style="--c:#bd3039"><b>Red Sox</b><span id="tc-sox">&mdash;</span></div>
-              <div class="sport" style="--c:#fcb514"><b>Bruins</b><span id="tc-bru">&mdash;</span></div>
-              <div class="sport" style="--c:#007a33"><b>Celtics</b><span id="tc-cel">&mdash;</span></div>
-              <div class="sport" style="--c:#c60c30"><b>Patriots</b><span id="tc-pat">&mdash;</span></div>
-            </div>
+          <div class="sk-group rv"><h4>Boston scoreboard</h4>
+            <div class="sports" id="sports">
+              <div class="sb skel" style="--c:#bd3039"><div class="sb-top"><div><b>Red Sox</b><small>loading&hellip;</small></div></div><div class="sb-match"></div></div>
+              <div class="sb skel" style="--c:#fcb514"><div class="sb-top"><div><b>Bruins</b><small>loading&hellip;</small></div></div><div class="sb-match"></div></div>
+              <div class="sb skel" style="--c:#007a33"><div class="sb-top"><div><b>Celtics</b><small>loading&hellip;</small></div></div><div class="sb-match"></div></div>
+              <div class="sb skel" style="--c:#c60c30"><div class="sb-top"><div><b>Patriots</b><small>loading&hellip;</small></div></div><div class="sb-match"></div></div></div>
           </div>
         </div>
       </div>
@@ -1111,25 +1128,57 @@ async function fetchTicker() {
 }
 buildTicker(tickerSyms.map(([sym]) => ({sym, price: 0}))); fetchTicker(); setInterval(fetchTicker, 60000);
 
-/* ---------------- Boston sports ---------------- */
-(async function(){
-  const teams = [{el:'tc-sox',sport:'baseball',league:'mlb',loc:'Boston',name:'Red Sox'},{el:'tc-bru',sport:'hockey',league:'nhl',loc:'Boston',name:'Bruins'},{el:'tc-cel',sport:'basketball',league:'nba',loc:'Boston',name:'Celtics'},{el:'tc-pat',sport:'football',league:'nfl',loc:'New England',name:'Patriots'}];
-  for (const t of teams) {
-    const el = document.getElementById(t.el);
-    try {
-      let game = null;
-      for (let off = 0; off <= 7 && !game; off++) {
-        const d = new Date(); d.setDate(d.getDate() + off);
-        const data = await fetch(`https://site.api.espn.com/apis/site/v2/sports/${t.sport}/${t.league}/scoreboard?dates=${d.toISOString().slice(0,10).replace(/-/g,'')}`).then(r => r.json()).catch(() => null);
-        game = data?.events?.find(ev => { const c = ev.competitions?.[0]; return c?.status?.type?.state !== 'post' && c?.competitors?.some(x => x.team?.location === t.loc || x.team?.displayName?.includes(t.name)); }) || null;
-      }
-      if (!game) { el.textContent = 'No game this week'; continue; }
-      const comp = game.competitions[0], bos = comp.competitors.find(c => c.team?.location === t.loc || c.team?.displayName?.includes(t.name)), opp = comp.competitors.find(c => c !== bos);
-      const vs = bos?.homeAway === 'home' ? 'vs' : '@', abbr = opp?.team?.abbreviation || '?';
-      if (comp.status?.type?.state === 'in') { el.textContent = `${vs} ${abbr} ${bos?.score || 0}–${opp?.score || 0} LIVE`; el.className = 'live'; }
-      else { const gd = new Date(game.date), now = new Date(), tm = new Date(); tm.setDate(tm.getDate() + 1); el.textContent = `${vs} ${abbr} · ${gd.toDateString() === now.toDateString() ? 'Today' : gd.toDateString() === tm.toDateString() ? 'Tmr' : gd.toLocaleDateString([], {month:'short', day:'numeric'})}`; }
-    } catch (e) { el.textContent = '—'; }
+/* ---------------- Boston scoreboard (ESPN public team feeds) ---------------- */
+(function(){
+  const TEAMS = [
+    {path:'baseball/mlb/teams/bos', name:'Red Sox', c:'#bd3039'},
+    {path:'hockey/nhl/teams/bos', name:'Bruins', c:'#fcb514'},
+    {path:'basketball/nba/teams/bos', name:'Celtics', c:'#007a33'},
+    {path:'football/nfl/teams/ne', name:'Patriots', c:'#c60c30'},
+  ];
+  const box = $('#sports'); let anyLive = false;
+  const logo = t => (t?.logos?.[0]?.href || t?.logo || '');
+  const score = c => typeof c?.score === 'object' ? c.score?.displayValue : c?.score;
+  function when(d) {
+    const g = new Date(d), now = new Date(), tm = new Date(); tm.setDate(now.getDate() + 1);
+    const day = g.toDateString() === now.toDateString() ? 'Today' : g.toDateString() === tm.toDateString() ? 'Tomorrow' : g.toLocaleDateString([], {weekday: 'short', month: 'short', day: 'numeric'});
+    return `${day} · ${g.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'})}`;
   }
+  function card(T, team, ev) {
+    const rec = team?.record?.items?.find(r => r.type === 'total')?.summary || '';
+    const top = `<div class="sb-top"><img src="${logo(team)}" alt="" loading="lazy"><div><b>${T.name}</b><small>${[rec, team?.standingSummary].filter(Boolean).join(' · ')}</small></div></div>`;
+    if (!ev) return `<div class="sb" style="--c:${T.c}">${top}<div class="sb-match"><div></div><div class="sb-mid"><div class="sb-vs">No game scheduled</div></div><div></div></div></div>`;
+    const comp = ev.competitions[0], st = comp.status?.type || {}, state = st.state;
+    const away = comp.competitors.find(x => x.homeAway === 'away'), home = comp.competitors.find(x => x.homeAway === 'home');
+    const bosId = String(team.id), isBos = x => String(x?.team?.id ?? x?.id) === bosId;
+    const side = x => `<div class="sb-team ${isBos(x) ? 'bos' : ''}"><img src="${logo(x.team)}" alt="" loading="lazy">${x.team.abbreviation}</div>`;
+    let mid;
+    if (state === 'pre') {
+      mid = `<div class="sb-when">${when(ev.date)}</div><div class="sb-state">${home && isBos(home) ? 'Home' : 'Away'}</div>`;
+    } else {
+      const a = score(away) ?? '0', h = score(home) ?? '0';
+      const bos = isBos(home) ? +h : +a, opp = isBos(home) ? +a : +h;
+      const cls = state === 'post' ? (bos > opp ? 'w' : bos < opp ? 'l' : '') : '';
+      mid = `<div class="sb-score"><span class="${isBos(away) ? cls : ''}">${a}</span> <span class="sb-vs">&ndash;</span> <span class="${isBos(home) ? cls : ''}">${h}</span></div>` +
+            (state === 'in' ? `<div class="sb-state live">${st.shortDetail || 'Live'}</div>` : `<div class="sb-state">${cls === 'w' ? 'Win' : cls === 'l' ? 'Loss' : 'Final'}${st.shortDetail && /OT|SO|\//.test(st.shortDetail) ? ' · ' + st.shortDetail.replace(/^Final\/?/, '') : ''}</div>`);
+      if (state === 'in') anyLive = true;
+    }
+    const tv = (comp.broadcasts || []).map(b => b.media?.shortName).filter(Boolean)[0];
+    const label = state === 'in' ? 'Live now' : state === 'post' ? 'Last game' : 'Next game';
+    const href = ev.links?.[0]?.href || '#';
+    return `<a class="sb" style="--c:${T.c}" href="${href}" target="_blank" rel="noopener">${top}
+      <div class="sb-match">${side(away)}<div class="sb-mid">${mid}</div>${side(home)}</div>
+      <div class="sb-foot"><span>${label}</span><span>${[tv, comp.venue?.fullName].filter(Boolean).join(' · ')}</span></div></a>`;
+  }
+  async function load() {
+    anyLive = false;
+    const cards = await Promise.all(TEAMS.map(T => fetch(`https://site.api.espn.com/apis/site/v2/sports/${T.path}`).then(r => r.json())
+      .then(d => card(T, d.team, d.team?.nextEvent?.[0]))
+      .catch(() => `<div class="sb" style="--c:${T.c}"><div class="sb-top"><div><b>${T.name}</b><small>Scores unavailable</small></div></div></div>`)));
+    box.innerHTML = cards.join('');
+    setTimeout(load, anyLive ? 30000 : 300000);
+  }
+  new IntersectionObserver((es, o) => es.forEach(e => { if (e.isIntersecting) { o.disconnect(); load(); } }), {rootMargin: '400px'}).observe(box);
 })();
 </script>
 </body>
