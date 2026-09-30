@@ -277,6 +277,7 @@ body.ready .hero-photo img{animation-play-state:running}
 .strip{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:12px;margin:0 calc(-1 * var(--gut));padding-left:var(--gut);padding-right:var(--gut);scrollbar-width:thin;scrollbar-color:var(--faint) transparent;cursor:grab}
 .strip.drag{cursor:grabbing;scroll-snap-type:none}
 .strip::-webkit-scrollbar{height:6px}.strip::-webkit-scrollbar-thumb{background:var(--faint);border-radius:6px}
+.deck-more{margin-top:16px}
 .slide{flex:0 0 auto;width:clamp(240px,30vw,400px);scroll-snap-align:start;border-radius:12px;overflow:hidden;border:1px solid var(--line-2);background:#fff;transition:transform .4s var(--ease),border-color .3s;position:relative}
 .slide:hover{transform:translateY(-4px);border-color:var(--acc)}
 .slide img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;pointer-events:none;user-select:none;-webkit-user-drag:none}
@@ -682,9 +683,9 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
           <div><dt>Currently</dt><dd>Consulting for Advantage Capital &middot; Senior Analyst at WUSIF</dd></div>
         </dl>
         <div class="skills">
-          <div class="sk-group rv"><h4>Finance</h4><div class="sk-list"><span>Financial Modeling</span><span>DCF Valuation</span><span>Comparable Analysis</span><span>Variance Analysis</span><span>Forecasting</span><span>Due Diligence</span><span>Project Finance</span><span>Equity Research</span></div></div>
-          <div class="sk-group rv"><h4>Quant &amp; ML</h4><div class="sk-list"><span>Machine Learning</span><span>Mixed-Integer Optimization</span><span>Regression &amp; Inference</span><span>Backtesting</span><span>Portfolio Optimization</span><span>Options Pricing</span><span>NLP</span><span>PyTorch</span><span>scikit-learn</span></div></div>
-          <div class="sk-group rv"><h4>Languages &amp; tools</h4><div class="sk-list"><span>Python</span><span>SQL</span><span>R</span><span>C++</span><span>Java</span><span>Excel / VBA</span><span>Bloomberg</span><span>Power BI</span><span>Snowflake</span><span>SAP</span><span>Git</span></div></div>
+          <div class="sk-group rv"><h4>Finance</h4><div class="sk-list"><span>Financial Modeling</span><span>DCF Valuation</span><span>Comparable Analysis</span><span>Variance Analysis</span><span>Forecasting</span><span>Due Diligence</span><span>Industry &amp; Market Analysis</span><span>Project Finance</span><span>Equity Research</span></div></div>
+          <div class="sk-group rv"><h4>Quant &amp; ML</h4><div class="sk-list"><span>Machine Learning</span><span>Mixed-Integer Optimization</span><span>Regression &amp; Inference</span><span>Backtesting</span><span>Portfolio Optimization</span><span>Volatility Modeling</span><span>NLP</span><span>PyTorch</span><span>scikit-learn</span></div></div>
+          <div class="sk-group rv"><h4>Languages &amp; tools</h4><div class="sk-list"><span>Python</span><span>SQL</span><span>R</span><span>C++</span><span>Java</span><span>Excel</span><span>Bloomberg</span><span>Power BI</span><span>Snowflake</span><span>SAP</span><span>Git</span></div></div>
           <div class="sk-group rv"><h4>Boston scoreboard</h4>
             <div class="sports" id="sports">
               <div class="sb skel" style="--c:#bd3039"><div class="sb-top"><div><b>Red Sox</b><small>loading&hellip;</small></div></div><div class="sb-match"></div></div>
@@ -755,19 +756,19 @@ const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','
 const DECKS = [
   {id:'calm', kind:'NASDAQ: CALM · WUSIF · Consumer Staples', title:'Cal-Maine Foods', stat:'+42%', statK:'upside · $84.71 → $120',
    desc:'Buy pitch built on the shift from commodity eggs to specialty and prepared foods (<b>30.4% → 39.8% of sales</b>, FY23–FY24). Full revenue-to-FCF model at a 5.41% WACC. <b>Cleared committee.</b>',
-   slides:[1,2,4,9,10,13,17,18]},
+   slides:[1,2,4,9,10,13,17,18], all:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]},
   {id:'anet', kind:'NYSE: ANET · WUSIF · Industrials', title:'Arista Networks', stat:'+20.9%', statK:'upside · $154.33 → $186.59',
    desc:'Thesis: a hardware vendor with software-grade economics, a <b>49% operating cash flow margin</b> and <b>$6.1B</b> in contracted forward revenue. Blended DCF and exit multiple at a 10.73% WACC. <b>Cleared committee.</b>',
-   slides:[1,3,5,9,12,13,17,19,20,23]},
+   slides:[1,3,5,9,12,13,17,19,20,23], all:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]},
   {id:'onon', kind:'NYSE: ONON · WUSIF · Consumer Discretionary', title:'On Holding', stat:'+43%', statK:'upside · $43.40 → $63.08',
    desc:'Premium Swiss performance brand: <b>60.6% gross margins</b>, 29% YoY revenue growth, and a fast-growing DTC channel. 10-year DCF in CHF at a 6.14% WACC.',
-   slides:[1,2,4,8,11,12,13,26]},
+   slides:[1,2,4,8,11,12,13,26], all:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26]},
   {id:'nba', group:'class', kind:'SDS 4130 · Linear Statistical Models · Spring 2026', title:'Predicting NBA Draft Success', stat:'1,024', statK:'candidate models searched',
    desc:'Can pre-draft combine measurables and college stats predict a player&apos;s first two NBA seasons? Built a full regression pipeline on 2022–2024 college-route draft picks: diagnostics, Box-Cox and weighted least squares corrections, and an exhaustive search of every predictor combination scored by AIC, BIC, and Mallows&apos; Cp. <b>Rebounding rate emerged as the strongest predictor of early NBA production.</b>',
-   slides:[1,2,4,5,6,15,16,22]},
+   slides:[1,2,4,5,6,15,16,22], all:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]},
   {id:'ozone', group:'class', kind:'SDS 4030 · Statistics for Data Science II · with Aaryabrat Chhatkuli', title:'What Drives Peak Ozone?', stat:'76.6%', statK:'of daily variation explained (R²)',
    desc:'Modeled daily peak ozone across 112 summer days in southern France, then stress-tested every conclusion: robust HC3 errors, IRLS, jackknife and bootstrap, <b>10,000-permutation tests</b>, Box-Cox, ridge and lasso. Every method agreed: <b>yesterday&apos;s ozone and morning cloud cover</b> drive today&apos;s peak.',
-   slides:[1,2,3,4,8,9,12,17]},
+   slides:[1,2,3,4,8,9,12,17], all:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]},
 ];
 const PROJECTS = [
   {title:'Congressional & Insider Trade Overlap Strategy', tags:['Quant research','AI-engineered'], link:'https://github.com/dmoriarty37/ai-engineered-predictive-pipeline',
@@ -837,8 +838,9 @@ const deckHTML = d => `
       ${d.stat ? `<div class="deck-stat rv d2"><div class="v">${d.stat}</div><div class="k">${d.statK}</div></div>` : `<div class="deck-stat rv d2"><span class="tag">${d.course}</span></div>`}
     </div>
     <div class="strip" data-deck="${d.id}">
-      ${d.slides.map((n, i) => `<button class="slide" data-deck="${d.id}" data-i="${i}" aria-label="${d.title} slide ${n}"><img src="assets/decks/${d.id}-${String(n).padStart(2,'0')}-sm.webp" alt="" loading="lazy" width="560" height="315"><span class="sn">${String(n).padStart(2,'0')}</span></button>`).join('')}
+      ${d.slides.map(n => `<button class="slide" data-deck="${d.id}" data-i="${d.all.indexOf(n)}" aria-label="${d.title} slide ${n}"><img src="assets/decks/${d.id}-${String(n).padStart(2,'0')}-sm.webp" alt="" loading="lazy" width="560" height="315"><span class="sn">${String(n).padStart(2,'0')}</span></button>`).join('')}
     </div>
+    <div class="deck-more"><button class="btn ghost sm" data-full="${d.id}">View full deck &middot; ${d.all.length} slides &rarr;</button></div>
   </div>`;
 $('#deckList').innerHTML = DECKS.filter(d => d.group !== 'class').map(deckHTML).join('');
 $('#classDecks').innerHTML = DECKS.filter(d => d.group === 'class').map(deckHTML).join('');
@@ -972,16 +974,17 @@ $$('.strip').forEach(s => {
 });
 const lb = $('#lb'); let lbDeck = null, lbI = 0;
 function lbShow() {
-  const d = lbDeck, n = d.slides[lbI];
+  const d = lbDeck, n = d.all[lbI];
   $('#lbImg').src = `assets/decks/${d.id}-${String(n).padStart(2,'0')}.webp`;
   $('#lbImg').alt = `${d.title}, slide ${n}`;
-  $('#lbTitle').textContent = d.title; $('#lbCount').textContent = `${lbI + 1} / ${d.slides.length}`;
+  $('#lbTitle').textContent = d.title; $('#lbCount').textContent = `${lbI + 1} / ${d.all.length}`;
   $('#lbFoot').textContent = d.kind;
-  const nx = d.slides[(lbI + 1) % d.slides.length]; new Image().src = `assets/decks/${d.id}-${String(nx).padStart(2,'0')}.webp`;
+  const nx = d.all[(lbI + 1) % d.all.length]; new Image().src = `assets/decks/${d.id}-${String(nx).padStart(2,'0')}.webp`;
 }
 $$('.slide').forEach(b => b.addEventListener('click', () => { lbDeck = DECKS.find(d => d.id === b.dataset.deck); lbI = +b.dataset.i; lbShow(); lb.classList.add('show'); document.body.style.overflow = 'hidden'; }));
 const lbClose = () => { lb.classList.remove('show'); document.body.style.overflow = ''; };
-const lbStep = k => { lbI = (lbI + k + lbDeck.slides.length) % lbDeck.slides.length; lbShow(); };
+const lbStep = k => { lbI = (lbI + k + lbDeck.all.length) % lbDeck.all.length; lbShow(); };
+$$('[data-full]').forEach(b => b.addEventListener('click', () => { lbDeck = DECKS.find(d => d.id === b.dataset.full); lbI = 0; lbShow(); lb.classList.add('show'); document.body.style.overflow = 'hidden'; }));
 $('#lbClose').onclick = lbClose; $('#lbPrev').onclick = () => lbStep(-1); $('#lbNext').onclick = () => lbStep(1);
 lb.addEventListener('click', e => { if (e.target === lb || e.target.classList.contains('lb-stage')) lbClose(); });
 let tsx = 0; lb.addEventListener('touchstart', e => tsx = e.touches[0].clientX, {passive: true});
