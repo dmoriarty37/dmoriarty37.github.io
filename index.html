@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>David Moriarty</title>
+<meta name="description" content="David Moriarty: Financial Engineering &amp; Data Science at WashU St. Louis. Former NASA OCFO Business Analyst Intern, WUSIF Senior Analyst.">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:wght@300;400;500;600&family=DM+Mono&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -49,6 +50,20 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;height:54px;display:flex;ali
 .stat-num{font-family:"DM Serif Display",serif;font-size:44px;color:var(--blue);line-height:1;letter-spacing:-1px}
 .stat-label{font-size:11px;color:var(--dim);margin-top:6px;font-weight:500;letter-spacing:.06em;text-transform:uppercase}
 section{padding:96px 48px;position:relative;z-index:1}
+.xp-list{display:flex;flex-direction:column;gap:14px}
+.xp-card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:26px 28px;box-shadow:0 1px 4px rgba(26,111,196,0.05);transition:box-shadow .22s}
+.xp-card:hover{box-shadow:0 8px 32px rgba(26,111,196,0.10)}
+.xp-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:4px}
+.xp-org{font-family:"DM Serif Display",serif;font-size:21px;color:var(--navy);letter-spacing:-0.3px}
+.xp-date{font-family:"DM Mono",monospace;font-size:12px;color:var(--dim);white-space:nowrap}
+.xp-role{font-size:13px;font-weight:600;color:var(--blue);margin-bottom:12px}
+.xp-role span{color:var(--dim);font-weight:400;margin-left:4px}
+.xp-bullets{list-style:none;display:flex;flex-direction:column;gap:7px}
+.xp-bullets li{font-size:14px;color:#4a6070;line-height:1.6;padding-left:16px;position:relative}
+.xp-bullets li::before{content:"";position:absolute;left:0;top:.62em;width:6px;height:6px;border-radius:50%;background:var(--blue-mid)}
+.xp-note{display:inline-block;margin-top:12px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:#e6f7f2;color:#0d7a5a;letter-spacing:.04em}
+.xp-mini{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:768px){.xp-mini{grid-template-columns:1fr}.xp-card{padding:22px 20px}}
 .sec-wrap{max-width:1100px;margin:0 auto}
 .sec-eyebrow{font-size:11px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.15em;margin-bottom:10px}
 .sec-title{font-family:"DM Serif Display",serif;font-size:clamp(30px,4vw,48px);color:var(--navy);letter-spacing:-1px;margin-bottom:12px;line-height:1.1}
@@ -153,6 +168,7 @@ footer{background:var(--navy);padding:28px 48px;display:flex;align-items:center;
   <div class="nav-logo">David Moriarty</div>
   <ul class="nav-links">
     <li><a href="#about">About</a></li>
+    <li><a href="#experience">Experience</a></li>
     <li><a href="#projects">Projects</a></li>
     <li><a href="#research">Research</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -162,9 +178,9 @@ footer{background:var(--navy);padding:28px 48px;display:flex;align-items:center;
 <section class="hero">
   <div class="hero-eyebrow">Finance &amp; Data Science  -  WashU St. Louis</div>
   <h1 class="hero-name">David<br><em>Moriarty</em></h1>
-<p class="hero-sub">Business Analyst at NASA Marshall Space Flight Center. I build data pipelines, analytics systems, and ML models that turn complex, multi-source data into decisions people can act on.</p>
+<p class="hero-sub">Senior studying Financial Engineering &amp; Data Science. Former Business Analyst Intern in NASA Marshall&apos;s Office of the CFO, now consulting for Advantage Capital on clean energy finance. I build models and data pipelines that turn complex, multi-source data into decisions people can act on.</p>
   <div class="hero-btns">
-    <a href="#pitches" class="btn-fill">View Research</a>
+    <a href="#experience" class="btn-fill">View Experience</a>
     <a href="#projects" class="btn-ghost">View Projects</a>
   </div>
 </section>
@@ -174,9 +190,9 @@ footer{background:var(--navy);padding:28px 48px;display:flex;align-items:center;
 </div>
 
 <div class="stats">
-  <div class="stat-cell"><div class="stat-num">12</div><div class="stat-label">Projects &amp; Pitches</div></div>
+  <div class="stat-cell"><div class="stat-num">13</div><div class="stat-label">Projects &amp; Pitches</div></div>
   <div class="stat-cell"><div class="stat-num">500+</div><div class="stat-label">Stocks Analyzed</div></div>
-  <div class="stat-cell"><div class="stat-num">NASA</div><div class="stat-label">Marshall · Summer 2026</div></div>
+  <div class="stat-cell"><div class="stat-num">NASA</div><div class="stat-label">Marshall OCFO · Summer 2026</div></div>
   <div class="stat-cell"><div class="stat-num">5+</div><div class="stat-label">ML Models Built</div></div>
 </div>
 
@@ -189,13 +205,14 @@ footer{background:var(--navy);padding:28px 48px;display:flex;align-items:center;
       </div>
       <div class="sec-eyebrow reveal">About Me</div>
       <div class="about-name reveal">More than<br>just markets.</div>
-      <p class="about-text reveal">I&apos;m a Junior at Washington University in St. Louis studying Data Science and Financial Engineering. Before WashU, I studied Engineering Sciences at Providence College, so I know my way around complex systems.</p>
-      <p class="about-text reveal">I come from a big family (4 siblings!), which taught me early on that life is better when you&apos;re part of a team. Growing up in that environment shaped how I approach everything: with curiosity, competitiveness, and a strong sense of loyalty.</p>
+      <p class="about-text reveal">I&apos;m a Senior at Washington University in St. Louis studying Financial Engineering and Data Science, graduating in May 2027. Before WashU, I studied Engineering Sciences with a minor in Mathematics at Providence College, so I know my way around complex systems.</p>
+      <p class="about-text reveal">I come from a big family (4 siblings!), which taught me early on that life is better when you&apos;re part of a team. Growing up in that environment shaped how I approach everything: with curiosity, competitiveness, and a strong sense of loyalty. I captained Providence College&apos;s club hockey team for two seasons, and spent five summers on a utility crew at Moriarty &amp; Sons replacing lead water service lines around Boston.</p>
       <p class="about-text reveal">When I&apos;m not coding or studying markets, you&apos;ll find me in the gym, working on my golf swing, or watching Boston sports. I love meeting new people and building connections, so don&apos;t be a stranger.</p>
       <div class="contact-row" id="contact">
-        <a href="/cdn-cgi/l/email-protection#fb9f969489929a898f82bb8c8e888f97d59e9f8e" class="contact-chip reveal">&#9993;&nbsp; <span class="__cf_email__" data-cfemail="1f7b72706d767e6d6b665f686a6c6b73317a7b6a">[email&#160;protected]</span></a>
-        <a href="https://www.linkedin.com/in/david--moriarty" class="contact-chip reveal" target="_blank">in&nbsp; LinkedIn</a>
-        <a href="tel:9789609653" class="contact-chip reveal">&#128222;&nbsp; (978) 960-9653</a>
+        <a href="mailto:dmoriarty@wustl.edu" class="contact-chip reveal">&#9993;&nbsp; dmoriarty@wustl.edu</a>
+        <a href="https://www.linkedin.com/in/david--moriarty" class="contact-chip reveal" target="_blank" rel="noopener">in&nbsp; LinkedIn</a>
+        <a href="https://github.com/dmoriarty37" class="contact-chip reveal" target="_blank" rel="noopener">&lt;/&gt;&nbsp; GitHub</a>
+        <a href="tel:+19788073586" class="contact-chip reveal">&#128222;&nbsp; (978) 807-3586</a>
       </div>
     </div>
     <div>
@@ -206,21 +223,21 @@ footer{background:var(--navy);padding:28px 48px;display:flex;align-items:center;
         </div>
       </div>
       <div class="reveal" style="margin-bottom:20px">
-        <div class="skill-group-title">Programming Languages</div>
+        <div class="skill-group-title">Languages &amp; Tools</div>
         <div class="skills-tags">
-          <span class="sk sk-blue">Python</span><span class="sk sk-blue">C++</span><span class="sk sk-blue">SQL</span><span class="sk sk-blue">R</span><span class="sk sk-blue">Java</span><span class="sk sk-blue">Git</span><span class="sk sk-blue">Excel / VBA</span>
+          <span class="sk sk-blue">Python</span><span class="sk sk-blue">C++</span><span class="sk sk-blue">SQL</span><span class="sk sk-blue">R</span><span class="sk sk-blue">Java</span><span class="sk sk-blue">Git</span><span class="sk sk-blue">Excel / VBA</span><span class="sk sk-blue">Power BI</span><span class="sk sk-blue">Snowflake</span><span class="sk sk-blue">SAP</span>
         </div>
       </div>
       <div class="reveal" style="margin-bottom:20px">
         <div class="skill-group-title">Quantitative Finance</div>
         <div class="skills-tags">
-          <span class="sk sk-teal">Backtesting</span><span class="sk sk-teal">Portfolio Optimization</span><span class="sk sk-teal">DCF Modeling</span><span class="sk sk-teal">Options Pricing</span><span class="sk sk-teal">Risk Modeling</span><span class="sk sk-teal">Bloomberg</span><span class="sk sk-teal">yfinance</span>
+          <span class="sk sk-teal">Backtesting</span><span class="sk sk-teal">Portfolio Optimization</span><span class="sk sk-teal">DCF Modeling</span><span class="sk sk-teal">Options Pricing</span><span class="sk sk-teal">Risk Modeling</span><span class="sk sk-teal">Mixed-Integer Optimization</span><span class="sk sk-teal">Bloomberg</span><span class="sk sk-teal">yfinance</span>
         </div>
       </div>
       <div class="reveal">
         <div class="skill-group-title">Finance &amp; Research</div>
         <div class="skills-tags">
-          <span class="sk sk-slate">Equity Research</span><span class="sk sk-slate">Financial Modeling</span><span class="sk sk-slate">WACC / Valuation</span><span class="sk sk-slate">Comparable Analysis</span><span class="sk sk-slate">Investment Pitches</span><span class="sk sk-slate">Impact Analysis</span>
+          <span class="sk sk-slate">Equity Research</span><span class="sk sk-slate">Financial Modeling</span><span class="sk sk-slate">WACC / Valuation</span><span class="sk sk-slate">Comparable Analysis</span><span class="sk sk-slate">Investment Pitches</span><span class="sk sk-slate">Impact Analysis</span><span class="sk sk-slate">Variance Analysis</span><span class="sk sk-slate">Forecasting</span><span class="sk sk-slate">Due Diligence</span><span class="sk sk-slate">Project Finance</span>
         </div>
       </div>
       <div class="reveal" style="margin-top:28px">
@@ -233,6 +250,74 @@ footer{background:var(--navy);padding:28px 48px;display:flex;align-items:center;
         </div>
       </div>
     </div>
+  </div>
+</div>
+</section>
+
+<section id="experience" style="background:#f4f7fb;">
+<div class="sec-wrap">
+  <div class="sec-eyebrow reveal">Experience</div>
+  <h2 class="sec-title reveal">Where I&apos;ve Worked</h2>
+  <p class="sec-sub reveal">Corporate finance, project finance, and investment research</p>
+  <div class="xp-list">
+
+    <div class="xp-card reveal">
+      <div class="xp-head"><div class="xp-org">Advantage Capital</div><div class="xp-date">Aug 2026 &ndash; Present</div></div>
+      <div class="xp-role">Student Consultant, WashU Olin Practicum <span>&middot; St. Louis, MO</span></div>
+      <ul class="xp-bullets">
+        <li>Evaluating whether the firm should launch a Clean Energy Finance business line, testing whether behind-the-meter battery storage projects for industrial hosts in Opportunity Zones clear return thresholds under an OZ-enhanced structure</li>
+        <li>Sizing the addressable market under conventional project finance vs. the OZ structure, modeling adoption against cost of capital and PPA price</li>
+        <li>Building the credit framework used to underwrite project hosts on offtake reliability and counterparty risk</li>
+        <li>Delivering a business plan to firm leadership: return model with downside sensitivities, go-to-market and fundraising plan, and a one-page investor executive summary</li>
+      </ul>
+    </div>
+
+    <div class="xp-card reveal">
+      <div class="xp-head"><div class="xp-org">NASA Marshall Space Flight Center</div><div class="xp-date">Jun &ndash; Aug 2026</div></div>
+      <div class="xp-role">Business Analyst Intern, Office of the Chief Financial Officer <span>&middot; Huntsville, AL</span></div>
+      <ul class="xp-bullets">
+        <li>Monitored $5B+ in capital deployment across the center&apos;s directorates against plan, building the center&apos;s FY26 investment tracking reporting for the Associate Director</li>
+        <li>Ran multi-year variance analysis (FY24&ndash;FY26) of committed spend vs. actuals by directorate, isolating under-executing accounts that leadership used to redirect funding before fiscal year close</li>
+        <li>Selected to model ~$7B in cost obligations and actuals across ~200 Science Mission Directorate projects at NASA headquarters, building the forecasting tool used for agency-wide financial planning</li>
+        <li>Optimized labor cost allocation across the center&apos;s operating budget with a mixed-integer linear program, replacing a multi-week manual estimate with an optimal distribution the budget team now runs recurringly</li>
+        <li>Briefed the center CFO and Associate Director</li>
+      </ul>
+      <span class="xp-note">Featured in NASA&apos;s newsletter for contributions to OCFO financial operations</span>
+    </div>
+
+    <div class="xp-card reveal">
+      <div class="xp-head"><div class="xp-org">WashU Student Investment Fund (WUSIF)</div><div class="xp-date">Aug 2025 &ndash; Present</div></div>
+      <div class="xp-role">Senior Analyst <span>&middot; St. Louis, MO</span></div>
+      <ul class="xp-bullets">
+        <li>Pitched a buy on Cal-Maine Foods (CALM), built around the shift from commodity eggs to specialty and prepared foods (specialty rose from 30.4% to 39.8% of sales, FY23&ndash;FY24)</li>
+        <li>Built the Arista Networks (ANET) buy thesis: a hardware vendor running software-grade economics, with a 49% operating cash flow margin and $6.1B in contracted forward revenue</li>
+        <li>Structured the diligence for both DCF builds while covering the industrials and consumer sectors; both names cleared committee into the $250k+ portfolio</li>
+      </ul>
+      <span class="xp-note">Team won &ldquo;Best Valuation Model&rdquo; at the WUSIF Pitch Competition</span>
+    </div>
+
+    <div class="xp-card reveal">
+      <div class="xp-head"><div class="xp-org">BioGenerator Ventures</div><div class="xp-date">Sep &ndash; Dec 2025</div></div>
+      <div class="xp-role">Student Consultant <span>&middot; St. Louis, MO</span></div>
+      <ul class="xp-bullets">
+        <li>Analyzed the full 137-company portfolio, quantifying $2.8B in follow-on capital raised against under $50M deployed by the firm: over 50x in external capital per dollar invested</li>
+        <li>Built the firm&apos;s first portfolio-wide performance framework tracking financial, workforce, and research KPIs (<a href="#research" style="color:var(--blue)">details below</a>)</li>
+      </ul>
+    </div>
+
+    <div class="xp-mini">
+      <div class="xp-card reveal">
+        <div class="xp-head"><div class="xp-org">Providence College Club Hockey</div><div class="xp-date">2023 &ndash; 2025</div></div>
+        <div class="xp-role">Captain (ACHA) <span>&middot; Providence, RI</span></div>
+        <ul class="xp-bullets"><li>Led a 25+ player roster, running practices, team meetings, and season travel logistics as the players&apos; point of contact with coaches and league officials</li></ul>
+      </div>
+      <div class="xp-card reveal">
+        <div class="xp-head"><div class="xp-org">Moriarty &amp; Sons Inc</div><div class="xp-date">Summers 2019 &ndash; 2024</div></div>
+        <div class="xp-role">Utility Contractor <span>&middot; Boston, MA</span></div>
+        <ul class="xp-bullets"><li>Replaced residential lead water service lines with copper and upgraded stormwater infrastructure, meeting municipal safety and regulatory requirements</li></ul>
+      </div>
+    </div>
+
   </div>
 </div>
 </section>
@@ -314,7 +399,19 @@ footer{background:var(--navy);padding:28px 48px;display:flex;align-items:center;
       <div class="proj-arrow">&#8594;</div>
     </div>
 
-    <div class="cat-label" style="margin-top:28px">Category 3  -  Data Science</div>
+    <div class="cat-label" style="margin-top:28px">Category 3  -  Data Science &amp; Applied AI</div>
+
+    <div class="proj-card reveal" style="border-left-color:#b91c1c;" onclick="openCode('nbagent','nb_style_agent.py')">
+      <div class="proj-icon" style="background:rgba(185,28,28,0.08);color:#b91c1c;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+      <div class="proj-info">
+        <div class="proj-meta"><span class="proj-tag tag-red">Hackathon</span><span class="course-badge">New Balance &times; WashU &middot; Mar 2026</span></div>
+        <div class="proj-title">NB Style Agent  -  Conversational Style Advisor</div>
+        <div class="proj-desc">Strategy lead and primary presenter for a conversational shopping agent pitched to New Balance. Built the working Python demo: it parses free-text answers about style, occasion, and budget, scores a 30-shoe catalog on fit, pairs each pick with outfit recommendations, and saves returning-user profiles. Framed the business case around cart abandonment, AI-assisted conversion lift, and NB&apos;s direct-to-consumer push.</div>
+        <div class="proj-stack"><span>Python</span><span>JSON</span><span>Recommendation Scoring</span><span>NLP Keyword Parsing</span><span>Product Strategy</span><span>Pitch</span></div>
+      </div>
+      <div class="proj-arrow">&#8594;</div>
+    </div>
+
 
     <div class="proj-card reveal" style="border-left-color:#b85c00;" onclick="openCode('melbourne','hw10_melbourne.py')">
       <div class="proj-icon" style="background:rgba(184,92,0,0.08);color:#b85c00;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
@@ -338,6 +435,17 @@ footer{background:var(--navy);padding:28px 48px;display:flex;align-items:center;
       <div class="proj-arrow">&#8594;</div>
     </div>
 
+    <div class="proj-card reveal" style="border-left-color:#0d7a5a;" onclick="window.open('https://github.com/dmoriarty37/DataManagementProj','_blank')">
+      <div class="proj-icon" style="background:rgba(13,122,90,0.08);color:#0d7a5a;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div>
+      <div class="proj-info">
+        <div class="proj-meta"><span class="proj-tag tag-teal">Data Engineering</span><span class="course-badge">Data Manipulation &amp; Management</span></div>
+        <div class="proj-title">Multi-Source Query Priority Dataset</div>
+        <div class="proj-desc">Unified technical questions from three sources into one labeled dataset: SciPy issues pulled through the GitHub REST API, the top 2,000 Stack Overflow questions via SQL on Stack Exchange Data Explorer, and a Kaggle university query set. Designed source-specific rules to infer Low/Medium/High priority where none existed, using title-prefix conventions, urgency keywords, and vote scores.</div>
+        <div class="proj-stack"><span>Python</span><span>pandas</span><span>GitHub REST API</span><span>SQL</span><span>Data Cleaning</span><span>Rule-Based Labeling</span></div>
+      </div>
+      <div class="proj-arrow">&#8594;</div>
+    </div>
+
   </div>
 </div>
 </section>
@@ -346,7 +454,7 @@ footer{background:var(--navy);padding:28px 48px;display:flex;align-items:center;
 <div class="sec-wrap">
   <div class="sec-eyebrow reveal">Research Experience</div>
   <h2 class="sec-title reveal">Data &amp; Analytics Work</h2>
-  <p class="sec-sub reveal">Impact analysis, equity research, and DCF modeling</p>
+  <p class="sec-sub reveal">Portfolio impact analysis, equity research, and DCF modeling</p>
   <div style="margin-bottom:40px">
     <div class="bgv-card reveal">
       <div class="bgv-header">
@@ -362,7 +470,7 @@ footer{background:var(--navy);padding:28px 48px;display:flex;align-items:center;
         <div class="bgv-stat"><div class="val">467+</div><div class="lbl">Patents Granted</div></div>
         <div class="bgv-stat"><div class="val">44</div><div class="lbl">WashU-Founded Companies</div></div>
       </div>
-      <div class="bgv-desc">Led the first-ever economic impact analysis for BioGenerator Ventures, a St. Louis life sciences VC whose 137 portfolio companies have raised $2.8B on under $50M of BioGenerator capital (60x+ leverage). Built multi-source database merging private financials with USPTO patents, LinkedIn employment data, and SEC filings across five key domains: workforce, innovation, partnerships, talent acquisition, and real estate. Quantified regional impact and delivered comprehensive report to BG leadership and WashU stakeholders, establishing data-driven baseline for 2026 fundraising and strategic planning.</div>
+      <div class="bgv-desc">Built BioGenerator Ventures&apos; first portfolio-wide performance framework, analyzing all 137 portfolio companies of the St. Louis seed-stage life sciences investor. Portfolio companies have raised $2.8B in follow-on capital on under $50M of BioGenerator capital, over 50x in external capital per dollar invested. Built a multi-source database merging private financials with USPTO patents, LinkedIn employment data, and SEC filings across workforce, innovation, partnerships, talent acquisition, and real estate, and delivered the analysis to industry partners and WashU stakeholders as the anchor figure for the firm&apos;s next fundraise.</div>
       <div class="bgv-row">
         <div>
           <div class="bgv-col-title">Portfolio Impact (2010-2025)</div>
@@ -382,10 +490,10 @@ footer{background:var(--navy);padding:28px 48px;display:flex;align-items:center;
     </div>
   </div>
   <div class="sec-eyebrow reveal" style="margin-bottom:16px">Stock Pitches</div>
-  <p style="font-size:15px;color:var(--dim);margin-bottom:24px;font-weight:300;">Original equity research and DCF models built through WUSIF</p>
+  <p style="font-size:15px;color:var(--dim);margin-bottom:24px;font-weight:300;">Original equity research and DCF models built through WUSIF. CALM and ANET cleared committee into the $250k+ fund, and our team won &ldquo;Best Valuation Model&rdquo; at the WUSIF Pitch Competition.</p>
   <div class="pitches-grid">
     <div class="pitch-card reveal">
-      <div class="pitch-ticker">NYSE: CALM</div>
+      <div class="pitch-ticker">NASDAQ: CALM</div>
       <div class="pitch-name">Cal-Maine Foods</div>
       <div class="pitch-org">WUSIF  -  Consumer Staples</div>
       <div class="pitch-stats">
@@ -393,7 +501,7 @@ footer{background:var(--navy);padding:28px 48px;display:flex;align-items:center;
         <div class="pitch-stat"><div class="val">$120</div><div class="lbl">Price Target</div></div>
         <div class="pitch-stat"><div class="val upside-badge upside-green">+42%</div><div class="lbl">Upside</div></div>
       </div>
-      <div class="pitch-thesis">Largest U.S. shell-egg producer transitioning from volatile commodity exposure to premium specialty eggs and prepared foods. $219M cage-free expansion, $1.2B net cash, and structural supply tailwinds from HPAI-driven competitor weakness. DCF and comps support significant upside. Built full revenue-to-FCF model with WACC of 5.41%.</div>
+      <div class="pitch-thesis">Largest U.S. shell-egg producer transitioning from volatile commodity exposure to premium specialty eggs and prepared foods, with specialty rising from 30.4% to 39.8% of sales (FY23&ndash;FY24). $219M cage-free expansion, $1.2B net cash, and structural supply tailwinds from HPAI-driven competitor weakness. DCF and comps support significant upside. Built full revenue-to-FCF model with WACC of 5.41%.</div>
     </div>
     <div class="pitch-card reveal">
       <div class="pitch-ticker">NYSE: ONON</div>
@@ -415,7 +523,7 @@ footer{background:var(--navy);padding:28px 48px;display:flex;align-items:center;
         <div class="pitch-stat"><div class="val">$186.59</div><div class="lbl">Price Target</div></div>
         <div class="pitch-stat"><div class="val upside-badge upside-green">+20.9%</div><div class="lbl">Upside</div></div>
       </div>
-      <div class="pitch-thesis">Leading high-speed networking provider positioned for the structural shift to Ethernet in AI back-end fabrics as hyperscalers move off InfiniBand. EOS software and platform consistency create deep switching costs, and blue-box disaggregation expands the addressable market. Blended DCF and exit-multiple valuation with a 10.73% WACC supports the $186.59 target.</div>
+      <div class="pitch-thesis">Leading high-speed networking provider positioned for the structural shift to Ethernet in AI back-end fabrics as hyperscalers move off InfiniBand. Software-grade economics (49% operating cash flow margin, $6.1B in contracted forward revenue, 39% switching share vs. Cisco&apos;s 18%) and EOS platform consistency create deep switching costs, and blue-box disaggregation expands the addressable market. Blended DCF and exit-multiple valuation with a 10.73% WACC supports the $186.59 target.</div>
     </div>
   </div>
 </div>
@@ -426,9 +534,10 @@ footer{background:var(--navy);padding:28px 48px;display:flex;align-items:center;
   <div class="footer-name">David Moriarty</div>
   <div class="footer-links">
     <a href="#about">About</a>
-    <a href="#pitches">Research</a>
+    <a href="#experience">Experience</a>
+    <a href="#research">Research</a>
     <a href="#projects">Projects</a>
-    <a href="/cdn-cgi/l/email-protection#c7a3aaa8b5aea6b5b3be87b0b2b4b3abe9a2a3b2">Email</a>
+    <a href="mailto:dmoriarty@wustl.edu">Email</a>
   </div>
   <div class="footer-copy">&copy; 2026 &middot; Washington University in St. Louis</div>
 </footer>
@@ -449,7 +558,7 @@ footer{background:var(--navy);padding:28px 48px;display:flex;align-items:center;
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 const obs = new IntersectionObserver(entries => {
   entries.forEach(e => {
     if (e.isIntersecting) {
@@ -624,6 +733,354 @@ document.getElementById('codeModal').addEventListener('click',function(e){if(e.t
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCode();});
 </script>
 
+<script type="text/plain" id="code_nbagent">"""
+NB Style Agent — Working Demo
+Run: python3 nb_style_agent.py
+
+Asks about your style, matches you to NB shoes,
+recommends outfits, and saves your preferences.
+"""
+
+import json
+import os
+import re
+import datetime
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = os.path.join(SCRIPT_DIR, "nb-shoe-data.json")
+PROFILES_PATH = os.path.join(SCRIPT_DIR, "user_profiles.json")
+
+with open(DATA_PATH) as f:
+    raw = json.load(f)
+shoes = raw["shoes"]
+
+
+# ── Outfit database ──
+
+OUTFITS = {
+    "casual": {
+        "clean": [
+            {"name": "Campus Clean", "top": "Oversized white tee, heavyweight cotton", "bottom": "Relaxed khaki chinos, slightly tapered", "layer": "Light olive bomber jacket", "accessories": "Minimal watch, canvas tote"},
+            {"name": "Coffee Run", "top": "Cream knit sweater, relaxed fit", "bottom": "Dark wash straight jeans", "layer": "", "accessories": "Simple leather belt"},
+        ],
+        "retro": [
+            {"name": "Throwback Easy", "top": "Striped rugby polo, oversized", "bottom": "Pleated wide-leg trousers, tan", "layer": "Varsity jacket", "accessories": "Retro sunglasses"},
+            {"name": "90s Rewind", "top": "Graphic vintage tee", "bottom": "Carpenter jeans, light wash", "layer": "Open flannel shirt", "accessories": "Beanie, simple chain"},
+        ],
+        "streetwear": [
+            {"name": "Street Essential", "top": "Oversized hoodie, grey or cream", "bottom": "Cargo pants, olive or stone", "layer": "Puffer vest", "accessories": "Minimal backpack, beanie"},
+            {"name": "Full Flex", "top": "Boxy oversized logo tee", "bottom": "Wide-leg track pants", "layer": "Windbreaker", "accessories": "Crossbody bag, chunky rings"},
+        ],
+        "premium": [
+            {"name": "Quiet Luxury", "top": "Cashmere crewneck, neutral tone", "bottom": "Tailored wool trousers", "layer": "Camel overcoat", "accessories": "Leather goods, minimal jewelry"},
+            {"name": "Elevated Casual", "top": "Merino polo, fitted", "bottom": "Pressed chinos, navy or stone", "layer": "Linen blazer", "accessories": "Quality watch, leather belt"},
+        ],
+    },
+    "night-out": {
+        "clean": [
+            {"name": "Understated Cool", "top": "Fitted black tee, premium cotton", "bottom": "Dark slim jeans, no distressing", "layer": "Minimal leather jacket", "accessories": "Thin silver chain, clean watch"},
+            {"name": "Smart Edge", "top": "Black mock neck", "bottom": "Tailored charcoal trousers", "layer": "Structured overcoat", "accessories": "Simple bracelet"},
+        ],
+        "retro": [
+            {"name": "Retro Night", "top": "Satin camp collar shirt, dark tones", "bottom": "High-waisted pleated trousers", "layer": "", "accessories": "Vintage watch, rings"},
+        ],
+        "streetwear": [
+            {"name": "After Dark", "top": "Oversized dark hoodie", "bottom": "Black cargo pants, tapered", "layer": "Long coat", "accessories": "Silver jewelry, cap"},
+        ],
+        "premium": [
+            {"name": "Uptown", "top": "Slim black button-down, top button open", "bottom": "Dark tailored trousers", "layer": "Navy blazer", "accessories": "Dress watch, subtle cologne"},
+        ],
+    },
+    "everyday": {
+        "clean": [
+            {"name": "Daily Uniform", "top": "Plain tee, any neutral color", "bottom": "Chinos or joggers, tapered", "layer": "Zip-up hoodie or light jacket", "accessories": "Whatever you grab first"},
+            {"name": "Effortless", "top": "Henley or long sleeve tee", "bottom": "Slim joggers, grey or navy", "layer": "Denim jacket", "accessories": "Backpack, simple watch"},
+        ],
+        "retro": [
+            {"name": "Easy Heritage", "top": "Polo shirt, relaxed fit", "bottom": "Straight-leg khakis", "layer": "Crewneck draped over shoulders", "accessories": "Canvas bag"},
+        ],
+        "streetwear": [
+            {"name": "Walk Around", "top": "Oversized tee, earth tones", "bottom": "Relaxed cargo or utility pants", "layer": "Coach jacket", "accessories": "Crossbody, bucket hat"},
+        ],
+        "premium": [
+            {"name": "Refined Daily", "top": "Quality cotton tee, perfect fit", "bottom": "Tailored joggers or slim chinos", "layer": "Half-zip sweater", "accessories": "Leather card case, clean watch"},
+        ],
+    },
+}
+
+
+# ── Keyword matching ──
+
+STYLE_KEYWORDS = {
+    "clean": ["clean", "minimal", "simple", "understated", "classic", "sleek", "timeless", "subtle", "basic", "neutral"],
+    "retro": ["retro", "vintage", "90s", "80s", "old school", "throwback", "nostalgic", "heritage", "classic"],
+    "streetwear": ["street", "streetwear", "urban", "hype", "bold", "edgy", "chunky", "y2k", "skate"],
+    "premium": ["premium", "luxury", "quality", "high-end", "designer", "expensive", "refined", "upscale", "quiet luxury", "dad shoe"],
+}
+
+OCCASION_KEYWORDS = {
+    "casual": ["class", "school", "coffee", "campus", "chill", "relax", "hang", "casual", "friends"],
+    "night-out": ["night", "evening", "bar", "club", "date", "dinner", "party", "going out", "drinks"],
+    "everyday": ["daily", "all day", "versatile", "everything", "all purpose", "walking", "errand", "everyday", "general"],
+}
+
+
+def detect_keywords(text, keyword_map):
+    text_lower = text.lower()
+    scores = {}
+    for category, words in keyword_map.items():
+        score = sum(1 for w in words if w in text_lower)
+        if score > 0:
+            scores[category] = score
+    return scores
+
+
+def extract_budget(text):
+    matches = re.findall(r'\$?(\d+)', text)
+    if matches:
+        return max(int(m) for m in matches)
+    return None
+
+
+def score_shoe(shoe, style_scores, occasion_scores, budget):
+    total = 0
+    shoe_tags = " ".join(shoe["style_tags"] + shoe["occasion_tags"]).lower()
+
+    for style, weight in style_scores.items():
+        for kw in STYLE_KEYWORDS.get(style, []):
+            if kw in shoe_tags:
+                total += weight * 2
+
+    for occ, weight in occasion_scores.items():
+        for kw in OCCASION_KEYWORDS.get(occ, []):
+            if kw in shoe_tags:
+                total += weight * 2
+
+    if budget:
+        if shoe["price"] <= budget:
+            total += 2
+        else:
+            total -= 5
+
+    return total
+
+
+def get_outfits(style, occasion):
+    occ = occasion if occasion in OUTFITS else "casual"
+    sty = style if style in OUTFITS.get(occ, {}) else "clean"
+    return OUTFITS.get(occ, {}).get(sty, OUTFITS["casual"]["clean"])
+
+
+def save_profile(profile):
+    profiles = []
+    if os.path.exists(PROFILES_PATH):
+        with open(PROFILES_PATH) as f:
+            try:
+                profiles = json.load(f)
+            except (json.JSONDecodeError, ValueError):
+                profiles = []
+    profiles.append(profile)
+    with open(PROFILES_PATH, "w") as f:
+        json.dump(profiles, f, indent=2)
+
+
+def load_returning_user():
+    if os.path.exists(PROFILES_PATH):
+        with open(PROFILES_PATH) as f:
+            try:
+                profiles = json.load(f)
+                if profiles:
+                    return profiles[-1]
+            except (json.JSONDecodeError, ValueError):
+                pass
+    return None
+
+
+# ── Main ──
+
+def main():
+    print()
+    print("=" * 50)
+    print("  NB STYLE AGENT")
+    print("  Your personal New Balance stylist")
+    print("=" * 50)
+    print()
+
+    # Check for returning user
+    prev = load_returning_user()
+    if prev:
+        print(f"  Welcome back! Last time you were into")
+        print(f"  {prev.get('detected_style', 'clean')} style for {prev.get('detected_occasion', 'casual')}.")
+        print(f"  Your top match was the {prev.get('top_match', '550')}.")
+        print()
+        again = input("  Want fresh recommendations? (yes/no): ").strip().lower()
+        if again in ("no", "n"):
+            print("\n  Come back when you're ready for something new!\n")
+            return
+        print()
+
+    # ── Ask questions ──
+
+    print("  Let's find your perfect shoe.\n")
+
+    style_input = input(
+        "  Describe your style in a few words.\n"
+        "  (like 'clean and minimal' or 'retro streetwear'\n"
+        "   or 'bold and chunky' or 'quiet luxury')\n\n"
+        "  > "
+    )
+
+    print()
+
+    occasion_input = input(
+        "  What are you wearing these for mostly?\n"
+        "  (like 'class and coffee' or 'nights out'\n"
+        "   or 'everyday everything')\n\n"
+        "  > "
+    )
+
+    print()
+
+    budget_input = input(
+        "  Budget? (like '$120' or '100-150' or\n"
+        "  just press enter to skip)\n\n"
+        "  > "
+    )
+
+    # ── Process ──
+
+    style_scores = detect_keywords(style_input, STYLE_KEYWORDS)
+    occasion_scores = detect_keywords(occasion_input, OCCASION_KEYWORDS)
+    budget = extract_budget(budget_input)
+
+    if not style_scores:
+        style_scores = {"clean": 1}
+    if not occasion_scores:
+        occasion_scores = {"casual": 1}
+
+    top_style = max(style_scores, key=style_scores.get)
+    top_occasion = max(occasion_scores, key=occasion_scores.get)
+
+    scored = [(shoe, score_shoe(shoe, style_scores, occasion_scores, budget)) for shoe in shoes]
+    scored.sort(key=lambda x: x[1], reverse=True)
+    top_shoes = scored[:3]
+
+    # ── Show results ──
+
+    print()
+    print("-" * 50)
+    print()
+    print("  YOUR STYLE PROFILE")
+    print(f"  Style:    {top_style}")
+    print(f"  Occasion: {top_occasion}")
+    if budget:
+        print(f"  Budget:   ${budget}")
+
+    print()
+    print("=" * 50)
+    print("  YOUR TOP 3 MATCHES")
+    print("=" * 50)
+
+    for i, (shoe, score) in enumerate(top_shoes):
+        match_pct = min(99, max(70, 75 + score * 2))
+        star = " ** BEST MATCH **" if i == 0 else ""
+
+        print()
+        print(f"  {i+1}. {shoe['model']}{star}")
+        print(f"     {shoe['colorways'][0]} colorway")
+        print(f"     ${shoe['price']}  |  {match_pct}% match")
+        print()
+        print(f"     {shoe['description']}")
+        print()
+        print(f"     Tech: {', '.join(shoe['features'][:3])}")
+        print(f"     Vibe: {', '.join(shoe['style_tags'][:4])}")
+        print(f"     Works for: {', '.join(shoe['occasion_tags'][:3])}")
+
+        if i == 0:
+            print()
+            print(f"     WHY THIS IS YOUR SHOE:")
+            reasons = {
+                "clean": f"The {shoe['model']} has clean lines that match your\n     minimal aesthetic. Versatile enough for {top_occasion}\n     without trying too hard. It looks intentional, not lazy.",
+                "retro": f"The {shoe['model']} nails the retro energy you described.\n     Heritage design that still feels current. Perfect for\n     {top_occasion} with a throwback edge.",
+                "streetwear": f"The {shoe['model']} brings the street presence you want.\n     Bold enough to anchor any fit, comfortable enough\n     for {top_occasion} all day.",
+                "premium": f"The {shoe['model']} is quiet luxury on your feet.\n     Premium materials, understated design, the kind of\n     shoe that people who know sneakers notice.",
+            }
+            print(f"     {reasons.get(top_style, f'The {shoe['model']} fits your {top_style} style perfectly.')}")
+
+        print()
+        print("  " + "-" * 46)
+
+    # ── Outfits ──
+
+    best_shoe = top_shoes[0][0]
+    outfits = get_outfits(top_style, top_occasion)
+
+    print()
+    print("=" * 50)
+    print(f"  COMPLETE OUTFITS")
+    print(f"  Built around your {best_shoe['model']}s")
+    print("=" * 50)
+
+    for outfit in outfits:
+        print()
+        print(f"  >> {outfit['name'].upper()}")
+        print(f"     Shoes:  {best_shoe['model']} ({best_shoe['colorways'][0]})")
+        print(f"     Top:    {outfit['top']}")
+        print(f"     Bottom: {outfit['bottom']}")
+        if outfit.get('layer') and outfit['layer']:
+            print(f"     Layer:  {outfit['layer']}")
+        print(f"     Extras: {outfit['accessories']}")
+
+    # ── Save profile ──
+
+    profile = {
+        "timestamp": datetime.datetime.now().isoformat(),
+        "raw_inputs": {
+            "style": style_input,
+            "occasion": occasion_input,
+            "budget": budget_input,
+        },
+        "detected_style": top_style,
+        "detected_occasion": top_occasion,
+        "budget": budget,
+        "top_match": best_shoe["model"],
+        "top_match_price": best_shoe["price"],
+        "top_3": [s[0]["model"] for s in top_shoes],
+        "style_scores": style_scores,
+        "occasion_scores": occasion_scores,
+    }
+    save_profile(profile)
+
+    print()
+    print("-" * 50)
+    print()
+    print("  Your style profile has been saved.")
+    print("  Next time you come back, we'll remember your")
+    print(f"  {top_style} preferences and suggest new drops")
+    print("  that match your taste.")
+    print()
+
+    # Show how many profiles collected
+    if os.path.exists(PROFILES_PATH):
+        with open(PROFILES_PATH) as f:
+            try:
+                all_profiles = json.load(f)
+                print(f"  [{len(all_profiles)} style profile(s) collected]")
+                print(f"  Data saved to: user_profiles.json")
+            except (json.JSONDecodeError, ValueError):
+                pass
+
+    print()
+    print("=" * 50)
+    print("  New Balance Style Agent")
+    print("  Your style. Curated by AI.")
+    print("=" * 50)
+    print()
+
+
+if __name__ == "__main__":
+    main()
+</script>
 <script type="text/plain" id="code_sentiment"># news_sentiment_predictor.py
 #
 # Install:
