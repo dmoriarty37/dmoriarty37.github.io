@@ -522,7 +522,7 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
         <div class="bstat hl rv"><div class="v">137</div><div class="l">companies started</div></div>
         <div class="bstat rv d1"><div class="v">~$50M</div><div class="l">invested by BioGenerator</div></div>
         <div class="bstat rv d2"><div class="v">$2.8B+</div><div class="l">raised by portfolio companies</div></div>
-        <div class="bstat rv d3 src"><div class="l">Figures are BioGenerator&apos;s own, from its October 2025 overview. Our team&apos;s job was measuring what that capital did for St. Louis.</div></div>
+        <div class="bstat rv d3"><div class="v">5</div><div class="l">impact areas measured for the first time</div></div>
       </div>
     </div>
   </div>
@@ -718,11 +718,11 @@ const DECKS = [
   {id:'onon', kind:'NYSE: ONON · WUSIF · Consumer Discretionary', title:'On Holding', stat:'+43%', statK:'upside · $43.40 → $63.08',
    desc:'Premium Swiss performance brand: <b>60.6% gross margins</b>, 29% YoY revenue growth, and a fast-growing DTC channel. 10-year DCF in CHF at a 6.14% WACC.',
    slides:[1,2,4,8,11,12,13,26]},
-  {id:'nba', group:'class', kind:'SDS 4130 · Linear Statistical Models · Spring 2026', title:'Predicting NBA Draft Success', course:'Class project',
-   desc:'Can pre-draft combine measurables and college stats predict how a player performs in his first two NBA seasons? A regression study of 2022–2024 college-route draft picks, with full diagnostics, transformations, and model selection. The honest answer: only a little. <b>Rebounding rate carried most of the signal.</b>',
+  {id:'nba', group:'class', kind:'SDS 4130 · Linear Statistical Models · Spring 2026', title:'Predicting NBA Draft Success', stat:'1,024', statK:'candidate models searched',
+   desc:'Can pre-draft combine measurables and college stats predict a player&apos;s first two NBA seasons? Built a full regression pipeline on 2022–2024 college-route draft picks: diagnostics, Box-Cox and weighted least squares corrections, and an exhaustive search of every predictor combination scored by AIC, BIC, and Mallows&apos; Cp. <b>Rebounding rate emerged as the strongest predictor of early NBA production.</b>',
    slides:[1,2,4,5,6,15,16,22]},
-  {id:'ozone', group:'class', kind:'SDS 4030 · Statistics for Data Science II · with Aaryabrat Chhatkuli', title:'What Drives Peak Ozone?', course:'Class project',
-   desc:'Which weather conditions drive daily peak ozone? A two-person final project working through regression, robust and resampling-based inference, and regularization on 112 summer days in southern France. <b>Yesterday&apos;s ozone and morning cloud cover</b> were the only predictors that held up.',
+  {id:'ozone', group:'class', kind:'SDS 4030 · Statistics for Data Science II · with Aaryabrat Chhatkuli', title:'What Drives Peak Ozone?', stat:'76.6%', statK:'of daily variation explained (R²)',
+   desc:'Modeled daily peak ozone across 112 summer days in southern France, then stress-tested every conclusion: robust HC3 errors, IRLS, jackknife and bootstrap, <b>10,000-permutation tests</b>, Box-Cox, ridge and lasso. Every method agreed: <b>yesterday&apos;s ozone and morning cloud cover</b> drive today&apos;s peak.',
    slides:[1,2,3,4,8,9,12,17]},
 ];
 const PROJECTS = [
