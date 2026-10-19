@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>David Moriarty</title>
-<meta name="description" content="David Moriarty: Financial Engineering &amp; Data Science at WashU St. Louis. Former NASA OCFO Business Analyst Intern, WUSIF Senior Analyst.">
+<meta name="description" content="David Moriarty: Financial Engineering &amp; Data Science at WashU St. Louis. Former NASA Business Analyst Intern, WUSIF Senior Analyst.">
 <meta name="theme-color" content="#0a0a0b">
 <meta property="og:title" content="David Moriarty">
 <meta property="og:description" content="Financial Engineering &amp; Data Science at WashU. Models, pipelines, and pitches.">
@@ -19,7 +19,7 @@
   --bg:#0a0a0b;--bg-2:#101012;--card:#141416;--card-2:#1b1b1e;
   --line:rgba(255,255,255,.08);--line-2:rgba(255,255,255,.15);
   --text:#f2f1ec;--dim:#8d8c88;--faint:#57564f;
-  --acc:#d4ff3a;--ink:#0a0a0b;--up:#4ade80;--dn:#f87171;--ice:#9fd4ff;--water:#2f7cff;
+  --acc:#d4ff3a;--acc-rgb:212,255,58;--ink:#0a0a0b;--up:#4ade80;--dn:#f87171;--ice:#9fd4ff;--water:#2f7cff;
   --ease:cubic-bezier(.2,.8,.2,1);--gut:clamp(16px,4vw,56px);
 }
 html{-webkit-text-size-adjust:100%}
@@ -71,7 +71,7 @@ section{position:relative;padding:clamp(88px,12vw,160px) var(--gut)}
 .split .w>span{display:inline-block;transform:translateY(105%);transition:transform 1s var(--ease)}
 .split.in .w>span{transform:none}
 .tag{display:inline-flex;align-items:center;font-family:"Geist Mono",monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;padding:5px 10px;border-radius:100px;border:1px solid var(--line-2);color:var(--dim);white-space:nowrap}
-.tag.a{border-color:rgba(212,255,58,.35);color:var(--acc)}
+.tag.a{border-color:rgba(var(--acc-rgb),.35);color:var(--acc)}
 .btn{display:inline-flex;align-items:center;gap:10px;padding:15px 24px;border-radius:100px;font-size:14.5px;font-weight:600;transition:background .25s,color .25s,border-color .25s;will-change:transform}
 .btn.fill{background:var(--acc);color:var(--ink)}
 .btn.fill:hover{background:var(--text)}
@@ -85,7 +85,7 @@ section{position:relative;padding:clamp(88px,12vw,160px) var(--gut)}
 .hero-photo img{width:100%;height:100%;object-fit:cover;object-position:62% 30%;transform:scale(1.08);animation:settle 2.2s var(--ease) forwards;animation-play-state:paused;filter:saturate(.9) contrast(1.05)}
 body.ready .hero-photo img{animation-play-state:running}
 @keyframes settle{to{transform:scale(1)}}
-.hero-glow{position:absolute;left:-15vw;bottom:-25vw;width:60vw;height:60vw;background:radial-gradient(circle,rgba(212,255,58,.12),transparent 60%);z-index:-1;pointer-events:none}
+.hero-glow{position:absolute;left:-15vw;bottom:-25vw;width:60vw;height:60vw;background:radial-gradient(circle,rgba(var(--acc-rgb),.12),transparent 60%);z-index:-1;pointer-events:none}
 .hero-inner{width:100%;max-width:1280px;margin:0 auto;padding:140px 0 36px}
 .status{display:inline-flex;align-items:center;gap:10px;font-size:13px;color:var(--dim);border:1px solid var(--line-2);padding:8px 14px 8px 12px;border-radius:100px;background:rgba(10,10,11,.5);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .status i{width:8px;height:8px;border-radius:50%;background:var(--up);animation:ping 2s infinite}
@@ -159,9 +159,9 @@ body.ready .hero-photo img{animation-play-state:running}
 .job-quote cite{display:block;font-family:"Geist Mono",monospace;font-style:normal;font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-top:8px}
 .job a.badge:hover{background:var(--acc);color:var(--ink)}
 .job ul{flex:1}
-.job .badge{transition:background .25s,color .25s;display:inline-flex;gap:8px;align-items:center;margin-top:18px;font-size:12.5px;font-weight:500;color:var(--acc);border:1px solid rgba(212,255,58,.3);background:rgba(212,255,58,.06);padding:7px 13px;border-radius:100px;align-self:flex-start}
+.job .badge{transition:background .25s,color .25s;display:inline-flex;gap:8px;align-items:center;margin-top:18px;font-size:12.5px;font-weight:500;color:var(--acc);border:1px solid rgba(var(--acc-rgb),.3);background:rgba(var(--acc-rgb),.06);padding:7px 13px;border-radius:100px;align-self:flex-start}
 .job .ghost-n{position:absolute;right:-8px;top:-30px;font-size:200px;font-weight:800;letter-spacing:-.08em;color:rgba(255,255,255,.025);line-height:1;pointer-events:none}
-.job.hl{background:linear-gradient(160deg,#1c1f10,var(--card) 60%)}
+.job.hl{background:linear-gradient(160deg,color-mix(in srgb,var(--acc) 9%,var(--card)),var(--card) 60%)}
 .hx-bar{position:absolute;left:var(--gut);right:var(--gut);bottom:36px;height:2px;background:var(--line)}
 .hx-bar i{position:absolute;inset:0;background:var(--acc);transform-origin:0 50%;transform:scaleX(0)}
 @media(max-width:900px),(prefers-reduced-motion:reduce){
@@ -218,7 +218,7 @@ body.ready .hero-photo img{animation-play-state:running}
 .grid{display:grid;grid-template-columns:repeat(21,1fr);gap:2px;max-width:480px;margin:0 auto;aspect-ratio:21/20}
 .grid i{display:block;border-radius:2px;background:rgba(255,255,255,.025)}
 .grid i.g{background:#2b2b30}
-.grid i.b{background:var(--acc);box-shadow:0 0 12px rgba(212,255,58,.5)}
+.grid i.b{background:var(--acc);box-shadow:0 0 12px rgba(var(--acc-rgb),.5)}
 .grid i.f{background:#8fa83a}
 .grid i.p{background:#fff;border-radius:50%;box-shadow:0 0 14px rgba(255,255,255,.6)}
 .grid i.goal{background:rgba(74,222,128,.35);box-shadow:inset 0 0 0 1px rgba(74,222,128,.8)}
@@ -231,7 +231,7 @@ body.ready .hero-photo img{animation-play-state:running}
 .lg{display:flex;gap:12px;align-items:center;background:var(--bg-2);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
 .lg i{width:16px;height:16px;flex-shrink:0}
 .lg-p{border-radius:50%;background:#fff;box-shadow:0 0 10px rgba(255,255,255,.6)}
-.lg-b{border-radius:3px;background:var(--acc);box-shadow:0 0 10px rgba(212,255,58,.5)}
+.lg-b{border-radius:3px;background:var(--acc);box-shadow:0 0 10px rgba(var(--acc-rgb),.5)}
 .lg b{display:block;font-size:13px;font-weight:600}
 .lg span{font-family:"Geist Mono",monospace;font-size:11.5px;color:var(--dim);line-height:1.9}
 .lg kbd,.overlay kbd{font-family:"Geist Mono",monospace;color:var(--text);border:1px solid var(--line-2);border-bottom-width:2px;border-radius:5px;padding:0 5px;font-size:11px}
@@ -423,7 +423,7 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
       <div class="l2"><span class="w"><span>Moriarty</span></span><span class="w"><span>.</span></span></div>
     </h1>
     <div class="hero-row">
-      <p class="hero-lede">Financial engineering &amp; data science at WashU. Ex-NASA OCFO. I build <span class="rotator" id="rotator"><span class="on">valuation models</span><span>forecasting tools</span><span>optimization models</span><span>dashboards</span></span><br>that turn messy data into decisions.</p>
+      <p class="hero-lede">Financial engineering &amp; data science at WashU. Ex-NASA. I build <span class="rotator" id="rotator"><span class="on">valuation models</span><span>forecasting tools</span><span>optimization models</span><span>dashboards</span></span><br>that turn messy data into decisions.</p>
       <div class="hero-btns">
         <a href="#experience" class="btn fill mag">See my work &darr;</a>
         <a href="#contact" class="btn ghost mag">Get in touch</a>
@@ -438,7 +438,7 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
 <section class="manifesto">
   <div class="wrap">
     <div class="eyebrow">A note to the reader</div>
-    <p class="mf" id="mf"><span class="mw">To</span> <span class="mw">whoever</span> <span class="mw">is</span> <span class="mw">reading</span> <span class="mw">this:</span> <span class="mw k">I</span> <span class="mw k">grew</span> <span class="mw k">up</span> <span class="mw k">on</span> <span class="mw k">a</span> <span class="mw k">hockey</span> <span class="mw k">rink,</span> <span class="mw">and</span> <span class="mw">the</span> <span class="mw">mentality</span> <span class="mw">I</span> <span class="mw">learned</span> <span class="mw">there</span> <span class="mw">is</span> <span class="mw">the</span> <span class="mw">one</span> <span class="mw">I</span> <span class="mw">bring</span> <span class="mw">to</span> <span class="mw">my</span> <span class="mw">work:</span> <span class="mw k">show</span> <span class="mw k">up</span> <span class="mw k">prepared,</span> <span class="mw k">outwork</span> <span class="mw k">the</span> <span class="mw k">room,</span> <span class="mw k">and</span> <span class="mw k">never</span> <span class="mw k">assume</span> <span class="mw k">the</span> <span class="mw k">job</span> <span class="mw k">is</span> <span class="mw k">finished.</span> <span class="mw">This</span> <span class="mw">site</span> <span class="mw">is</span> <span class="mw">a</span> <span class="mw">record</span> <span class="mw">of</span> <span class="mw">that</span> <span class="mw">effort,</span> <span class="mw">from</span> <span class="mw">NASA&apos;s</span> <span class="mw">Office</span> <span class="mw">of</span> <span class="mw">the</span> <span class="mw">CFO,</span> <span class="mw">to</span> <span class="mw">stock</span> <span class="mw">pitches</span> <span class="mw">defended</span> <span class="mw">in</span> <span class="mw">front</span> <span class="mw">of</span> <span class="mw">an</span> <span class="mw">investment</span> <span class="mw">committee,</span> <span class="mw">to</span> <span class="mw">the</span> <span class="mw">first</span> <span class="mw">programs</span> <span class="mw">I</span> <span class="mw">ever</span> <span class="mw">wrote.</span> <span class="mw k">I&apos;m</span> <span class="mw k">proud</span> <span class="mw k">of</span> <span class="mw k">it,</span> <span class="mw k">but</span> <span class="mw k">I&apos;m</span> <span class="mw k">not</span> <span class="mw k">satisfied.</span> <span class="mw">Thank</span> <span class="mw">you</span> <span class="mw">for</span> <span class="mw">taking</span> <span class="mw">the</span> <span class="mw">time,</span> <span class="mw">and</span> <span class="mw">if</span> <span class="mw">something</span> <span class="mw">here</span> <span class="mw">catches</span> <span class="mw">your</span> <span class="mw">eye,</span> <span class="mw">I&apos;d</span> <span class="mw">welcome</span> <span class="mw">the</span> <span class="mw">conversation.</span></p>
+    <p class="mf" id="mf"><span class="mw">To</span> <span class="mw">whoever</span> <span class="mw">is</span> <span class="mw">reading</span> <span class="mw">this:</span> <span class="mw k">I</span> <span class="mw k">grew</span> <span class="mw k">up</span> <span class="mw k">on</span> <span class="mw k">a</span> <span class="mw k">hockey</span> <span class="mw k">rink,</span> <span class="mw">and</span> <span class="mw">the</span> <span class="mw">mentality</span> <span class="mw">I</span> <span class="mw">learned</span> <span class="mw">there</span> <span class="mw">is</span> <span class="mw">the</span> <span class="mw">one</span> <span class="mw">I</span> <span class="mw">bring</span> <span class="mw">to</span> <span class="mw">my</span> <span class="mw">work:</span> <span class="mw k">show</span> <span class="mw k">up</span> <span class="mw k">prepared,</span> <span class="mw k">outwork</span> <span class="mw k">the</span> <span class="mw k">room,</span> <span class="mw k">and</span> <span class="mw k">never</span> <span class="mw k">assume</span> <span class="mw k">the</span> <span class="mw k">job</span> <span class="mw k">is</span> <span class="mw k">finished.</span> <span class="mw">This</span> <span class="mw">site</span> <span class="mw">is</span> <span class="mw">a</span> <span class="mw">record</span> <span class="mw">of</span> <span class="mw">that</span> <span class="mw">effort,</span> <span class="mw">from</span> <span class="mw">my</span> <span class="mw">work</span> <span class="mw">at</span> <span class="mw">NASA,</span> <span class="mw">to</span> <span class="mw">stock</span> <span class="mw">pitches</span> <span class="mw">defended</span> <span class="mw">in</span> <span class="mw">front</span> <span class="mw">of</span> <span class="mw">an</span> <span class="mw">investment</span> <span class="mw">committee,</span> <span class="mw">to</span> <span class="mw">the</span> <span class="mw">first</span> <span class="mw">programs</span> <span class="mw">I</span> <span class="mw">ever</span> <span class="mw">wrote.</span> <span class="mw k">I&apos;m</span> <span class="mw k">proud</span> <span class="mw k">of</span> <span class="mw k">it,</span> <span class="mw k">but</span> <span class="mw k">I&apos;m</span> <span class="mw k">not</span> <span class="mw k">satisfied.</span> <span class="mw">Thank</span> <span class="mw">you</span> <span class="mw">for</span> <span class="mw">taking</span> <span class="mw">the</span> <span class="mw">time,</span> <span class="mw">and</span> <span class="mw">if</span> <span class="mw">something</span> <span class="mw">here</span> <span class="mw">catches</span> <span class="mw">your</span> <span class="mw">eye,</span> <span class="mw">I&apos;d</span> <span class="mw">welcome</span> <span class="mw">the</span> <span class="mw">conversation.</span></p>
     <div class="mf-sig rv">&mdash; David</div>
   </div>
 </section>
@@ -475,7 +475,7 @@ footer{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;paddin
         <div class="ghost-n">02</div>
         <div class="job-n"><span>Jun &mdash; Aug 2026</span><span>Huntsville</span></div>
         <div class="job-org">NASA Marshall Space Flight Center</div>
-        <div class="job-role">Business Analyst Intern, Office of the CFO</div>
+        <div class="job-role">Business Analyst Intern</div>
         <p class="job-co">One of NASA&apos;s largest field centers, in Huntsville, Alabama, home of rocket propulsion and the Space Launch System program. <a href="https://www.nasa.gov/marshall" target="_blank" rel="noopener">nasa.gov/marshall &nearr;</a></p>
         <ul>
           <li>Monitored $5B+ in capital deployment across the center&apos;s directorates against plan, building the FY26 investment tracking reporting and running FY24&ndash;FY26 variance analysis leadership used to redirect funding</li>
@@ -1018,7 +1018,7 @@ addEventListener('keydown', e => {
     if (!D) return;
     const T = D.T[fi], n = T.length, shimmer = performance.now() / 600;
     ctx.clearRect(0, 0, W, W);
-    ctx.save(); ctx.beginPath(); ctx.arc(C, C, Rpx + 30, 0, Math.PI * 2); ctx.fillStyle = 'rgba(212,255,58,.03)'; ctx.fill(); ctx.restore();
+    ctx.save(); ctx.beginPath(); ctx.arc(C, C, Rpx + 30, 0, Math.PI * 2); ctx.fillStyle = 'rgba(var(--acc-rgb),.03)'; ctx.fill(); ctx.restore();
     for (let i = n - 1; i >= 0; i--) {
       const rKm = D.R_km * i / (n - 1), r = Rpx * i / (n - 1) + Rpx / (n - 1) / 2;
       let c = color(T[i], rKm);
@@ -1039,7 +1039,7 @@ addEventListener('keydown', e => {
     if (ph !== curPhase) { if (playing && curPhase >= 0) hold = performance.now() + 1400; curPhase = ph; const P = PHASES[ph]; $('#phK').textContent = `Phase ${ph + 1} of 4`; $('#phT').textContent = P[0]; $('#phD').textContent = P[1]; }
     const mx = 120, pts = D.ocean_km.map((v, i) => `${(i / (D.ocean_km.length - 1) * 400).toFixed(1)},${(86 - v / mx * 80).toFixed(1)}`);
     const upto = pts.slice(0, fi + 1).join(' ');
-    $('#spark').innerHTML = `<polyline points="${pts.join(' ')}" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="2" vector-effect="non-scaling-stroke"/><polyline points="${upto}" fill="none" stroke="#2f7cff" stroke-width="3" vector-effect="non-scaling-stroke"/><line x1="${fi / (D.T.length - 1) * 400}" x2="${fi / (D.T.length - 1) * 400}" y1="0" y2="90" stroke="#d4ff3a" stroke-width="1.5" vector-effect="non-scaling-stroke"/>`;
+    $('#spark').innerHTML = `<polyline points="${pts.join(' ')}" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="2" vector-effect="non-scaling-stroke"/><polyline points="${upto}" fill="none" stroke="#2f7cff" stroke-width="3" vector-effect="non-scaling-stroke"/><line x1="${fi / (D.T.length - 1) * 400}" x2="${fi / (D.T.length - 1) * 400}" y1="0" y2="90" stroke="${getComputedStyle(document.documentElement).getPropertyValue('--acc').trim()}" stroke-width="1.5" vector-effect="non-scaling-stroke"/>`;
     scrub.value = fi;
   }
   function loop(now) {
