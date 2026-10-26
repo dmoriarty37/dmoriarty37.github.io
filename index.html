@@ -1159,8 +1159,9 @@ buildTicker(tickerSyms.map(([sym]) => ({sym, price: 0}))); fetchTicker(); setInt
     const day = g.toDateString() === now.toDateString() ? 'Today' : g.toDateString() === tm.toDateString() ? 'Tomorrow' : g.toLocaleDateString([], {weekday: 'short', month: 'short', day: 'numeric'});
     return `${day} · ${g.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'})}`;
   }
-  function card(T, team, ev) {
-    const rec = team?.record?.items?.find(r => r.type === 'total')?.summary || '';
+  function card(T, team, ev, seasonType) {
+    let rec = team?.recordSummary || team?.record?.items?.find(r => r.type === 'total')?.summary || '';
+    if (rec && seasonType === 3) rec += ' playoffs';
     const top = `<div class="sb-top"><img src="${logo(team)}" alt="" loading="lazy"><div><b>${T.name}</b><small>${[rec, team?.standingSummary].filter(Boolean).join(' · ')}</small></div></div>`;
     if (!ev) return `<div class="sb" style="--c:${T.c}">${top}<div class="sb-match"><div></div><div class="sb-mid"><div class="sb-vs">No game scheduled</div></div><div></div></div></div>`;
     const comp = ev.competitions[0], st = comp.status?.type || {}, state = st.state;
@@ -1185,10 +1186,25 @@ buildTicker(tickerSyms.map(([sym]) => ({sym, price: 0}))); fetchTicker(); setInt
       <div class="sb-match">${side(away)}<div class="sb-mid">${mid}</div>${side(home)}</div>
       <div class="sb-foot"><span>${label}</span><span>${[tv, comp.venue?.fullName].filter(Boolean).join(' · ')}</span></div></a>`;
   }
+  // Pick the game to show: live > just finished (last 24h) > next scheduled > most recent
+  function pickEvent(events) {
+    const st = e => e.competitions?.[0]?.status?.type?.state;
+    const live = events.find(e => st(e) === 'in');
+    if (live) return live;
+    const post = events.filter(e => st(e) === 'post').sort((a, b) => new Date(b.date) - new Date(a.date));
+    if (post[0] && Date.now() - new Date(post[0].date) < 864e5) return post[0];
+    const pre = events.filter(e => st(e) === 'pre').sort((a, b) => new Date(a.date) - new Date(b.date));
+    return pre[0] || post[0] || null;
+  }
+  const base = p => `https://site.api.espn.com/apis/site/v2/sports/${p}`;
+  // The schedule feed allows cross-site reads; the plain team feed is kept as a fallback
+  const getTeam = T => fetch(base(T.path) + '/schedule').then(r => r.ok ? r.json() : Promise.reject())
+    .then(d => ({team: d.team, ev: pickEvent(d.events || []), seasonType: d.season?.type}))
+    .catch(() => fetch(base(T.path)).then(r => r.json()).then(d => ({team: d.team, ev: d.team?.nextEvent?.[0]})));
   async function load() {
     anyLive = false;
-    const cards = await Promise.all(TEAMS.map(T => fetch(`https://site.api.espn.com/apis/site/v2/sports/${T.path}`).then(r => r.json())
-      .then(d => card(T, d.team, d.team?.nextEvent?.[0]))
+    const cards = await Promise.all(TEAMS.map(T => getTeam(T)
+      .then(({team, ev, seasonType}) => card(T, team, ev, seasonType))
       .catch(() => `<div class="sb" style="--c:${T.c}"><div class="sb-top"><div><b>${T.name}</b><small>Scores unavailable</small></div></div></div>`)));
     box.innerHTML = cards.join('');
     setTimeout(load, anyLive ? 30000 : 300000);
